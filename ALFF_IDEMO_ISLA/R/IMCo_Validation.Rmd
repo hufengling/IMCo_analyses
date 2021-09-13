@@ -45,17 +45,28 @@ nifti_dir <- file.path(input_dir,
                        list("niftis/alff",
                             "niftis/cbf",
                             "niftis/idemo"))
-mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
+mask <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz") %>% check_ants()
 
-settings <- list(output_dir = output_dir,
+settings <- list(input = input_filepaths,
+                 output_dir = output_dir,
                  input_dir = input_dir,
                  nifti_dir = nifti_dir,
-                 mask_path = mask_path)
+                 mask = mask)
 ```
 
 # Intermodal Coupling
 ```{r}
-global_wcov <- imco(files, mask,
+test <- imco(list(settings$input$modality_1[1], settings$input$modality_2[1], settings$input$modality_3[1]), brainMask = settings$mask, out_dir = file.path(output_dir, "global_wcov"), out_name = "2647", ref = 1, fwhm = 3, retimg = T, type = "pca",
+  propMiss = 0.9, pcaType = "global", matrixType = "wcov"
+)
+bsub_global-wcov <- "imco(list(input_filepaths$modality_1, input_filepaths$modality_2, input_filepaths$modality_3), mask,
+  ref = 1, fwhm = 3, retimg = T, type = "pca",
+  propMiss = 0.9, pcaType = "global", matrixType = "wcov"
+)
+for(i in 1:1){
+  system2("Rscript -e '")
+}
+global_wcov <- imco(list(input_filepaths$modality_1, input_filepaths$modality_2, input_filepaths$modality_3), mask,
   ref = 1, fwhm = 3, retimg = T, type = "pca",
   propMiss = 0.9, pcaType = "global", matrixType = "wcov"
 )
