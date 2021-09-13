@@ -1,0 +1,21 @@
+columnName        columnDescription
+bblid        Subject's bblid
+scanid        Subject's scanid
+pcaslExclude        A binary flag indicating whether the subject's pcasl values should be excluded from ROI analysis if the subject has anything flagged for motion - tSNR - mean GM signal - no data exclude - Exclusionary if True
+pcaslVoxelwiseExclude        A binary flag indicating whether the subject's pcasl values should be excluded from ROI analysis if the subject has anything flagged for motion        tSNR - mean GM signal no data exclude - or coverage exclude - Exclusionary if True
+pcaslNoDataExclude        no ASL data collected - Exclusionary if true.
+pcaslRelMeanRMSMotion        meanrelrms from the output of mcflirt
+pcaslRelMeanRMSMotionExclude        if pcaslRelMeanRMSMotion > 0.5 this value is set to 1
+pcaslTSNR        output TSNR value computed during the DICO module in XCP
+pcaslTSNRExclude        if pcaslTSNR < 30 this value is set to 1
+pcaslNormCrossCorr        The cross corr between the Template mask and the PCASL image mask.
+pcaslNormCoverage        The coverage value between the PCASL image mask and the Template mask
+pcaslCoregCrossCorr        The cross corr computed between the subject's anatomical image mask and the PCASL image mask
+pcaslCoregCoverage        The coverage value computed between the PCASL image mask and the subject's anatomical image mask
+pcaslNVolumesAcquired        Number of TR's acquired
+pcaslNVolumesAcquiredExclude        if pcaslNVolumesAcquired < 80 this value is set to 1
+pcaslCoverageExclude        A value indicating if sufficient coverage was acquired during acquisition 
+pcaslRpsMapCorrectionNotApplied        A value indicating if distortion correction was applied to the asl time series
+pcaslMeanGMValue        The mean GM CBF value computed over the normalized PCASL image
+pcaslMeanGMValueExclude        If pcaslMeanGMValue < 15 (2.5 std's below mean of mean PCASL GM Value) this value is set to 1
+
