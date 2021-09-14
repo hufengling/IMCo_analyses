@@ -30,9 +30,11 @@ common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
-  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("input/niftis/alff", .)) %>% 
-  mutate(modality_2 = paste0(subj_num, "_asl_quant_ssT1Std.nii.gz")%>% file.path("input/niftis/cbf", .)) %>% 
-  mutate(modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("input/niftis/idemo", .))
+  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("input/niftis/alff", .) %>% here(),
+         modality_2 = paste0(subj_num, "_asl_quant_ssT1Std.nii.gz")%>% file.path("input/niftis/cbf", .) %>% here(), 
+         modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("input/niftis/idemo", .) %>% here())
+
+write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
 rm(common_pts, idemo, idemo_health, idemo_qa)
 ```
@@ -46,40 +48,54 @@ nifti_dir <- file.path(input_dir,
                             "niftis/cbf",
                             "niftis/idemo"))
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
+input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
+batch_script_dir <- here("R/batch_scripts")
 
 fwhm <- 3
 propMiss <- 0.9
 
-settings <- list(input = input_filepaths,
-                 output_dir = output_dir,
-                 input_dir = input_dir,
-                 nifti_dir = nifti_dir,
-                 mask_path = mask_path,
-                 fwhm = fwhm,
-                 propMiss = propMiss)
+settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv"),
+              output_dir = output_dir,
+              input_dir = input_dir,
+              nifti_dir = nifti_dir,
+              batch_script_dir = batch_script_dir,
+              mask_path = mask_path,
+              fwhm = fwhm,
+              propMiss = propMiss)
+
+save(settings, file = file.path(input_dir, "csvs/settings.RData"))
+
 ```
 
 # Intermodal Coupling
 ```{r}
-x <- "hello"
-for(i in 1:2) {#nrow(settings$input_filepaths)) {
-  line <- settings$input[i, ]
+bash_file <- rep(0, 2)
+for(i in 1:2) {
+  line <- input_filepaths[i, ]
   out_name <- line[1]
-  subject_files <- cat(line[1, 2], line[1, 3], line[1, 4])
-  system2("Rscript", args = c("R/batch_scripts/01_perform_imco.R",
-                              subject_files, 
-                              settings$mask_path,
-                              file.path(settings$output_dir, "niftis/coupled/global_wcov"),
-                              settings$fwhm,
-                              settings$propMiss,
-                              "global",
-                              "wcov"))
-                              
+  subject_files <- paste(line[1, 2], line[1, 3], line[1, 4], sep = ",")
+  
+  bsub_args <- paste("bsub",
+                     "-q taki_normal",
+                     paste("-J", shQuote("intermodal_coupling")),
+                     paste("-R", shQuote("rusage[mem=4000]")),
+                     "-M 10000",
+                     paste("-o", file.path(settings$output_dir, "stdout/intermodal_coupling.txt")))
+  
+  Rscript_args <- paste("Rscript", here("R/batch_scripts/01_perform_imco.R"),
+                        subject_files,
+                        settings$mask_path,
+                        settings$output_dir,
+                        out_name)
+  bash_file[i] <- paste(bsub_args, Rscript_args)
+  # system2("Rscript", args = c("R/batch_scripts/01_perform_imco.R",
+  #                             subject_files,
+  #                             settings$mask_path,
+  #                             settings$output_dir,
+  #                             out_name
+  # ))
 }
 
-global_wcov <- imco(files, mask,
-                    ref = 1, fwhm = 3, retimg = T, type = "pca",
-                    propMiss = 0.9, pcaType = "global", matrixType = "wcov"
-)
+write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
 ```
 
