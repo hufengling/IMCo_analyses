@@ -69,8 +69,8 @@ save(settings, file = file.path(input_dir, "csvs/settings.RData"))
 
 # Intermodal Coupling
 ```{r}
-bash_file <- rep(0, 2)
-for(i in 1:2) {
+bash_file <- rep(0, nrow(input_filepaths))
+for(i in 1:nrow(input_filepaths)) {
   line <- input_filepaths[i, ]
   out_name <- line[1]
   subject_files <- paste(line[1, 2], line[1, 3], line[1, 4], sep = ",")
