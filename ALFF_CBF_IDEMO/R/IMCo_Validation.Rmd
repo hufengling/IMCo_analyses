@@ -13,7 +13,7 @@ library(IMCo)
 library(here)
 ```
 
-## File names
+## Input nifti names
 ```{r}
 idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv"))
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
@@ -30,9 +30,9 @@ common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
-  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("input/niftis/alff", .) %>% here(),
-         modality_2 = paste0(subj_num, "_asl_quant_ssT1Std.nii.gz")%>% file.path("input/niftis/cbf", .) %>% here(), 
-         modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("input/niftis/idemo", .) %>% here())
+  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff"),
+         modality_2 = paste0(subj_num, "_asl_quant_ssT1Std.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf"), 
+         modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo"))
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
@@ -41,6 +41,8 @@ rm(common_pts, idemo, idemo_health, idemo_qa)
 
 ## Global Settings
 ```{r}
+input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
+
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
 nifti_dir <- file.path(input_dir, 
@@ -48,23 +50,41 @@ nifti_dir <- file.path(input_dir,
                             "niftis/cbf",
                             "niftis/idemo"))
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
-input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
 batch_script_dir <- here("R/batch_scripts")
-
 fwhm <- 3
 propMiss <- 0.9
 
 settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv"),
-              output_dir = output_dir,
-              input_dir = input_dir,
-              nifti_dir = nifti_dir,
-              batch_script_dir = batch_script_dir,
-              mask_path = mask_path,
-              fwhm = fwhm,
-              propMiss = propMiss)
+                 output_dir = output_dir,
+                 input_dir = input_dir,
+                 nifti_dir = nifti_dir,
+                 batch_script_dir = batch_script_dir,
+                 mask_path = mask_path,
+                 fwhm = fwhm,
+                 propMiss = propMiss)
 
 save(settings, file = file.path(input_dir, "csvs/settings.RData"))
+```
 
+## Loading non-nifti PNC data
+```{r}
+demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")) %>% 
+  rename(subj_num = id)
+demographics <- right_join(demographics, input_filepaths, 
+                           by = "subj_num") %>% 
+  mutate(across(contains("Exclude"), as.factor),
+         sex = case_when(
+           sex == 1 ~ "Male",
+           sex == 2 ~ "Female",
+           T ~ NA_character_),
+         race2 = case_when(
+           race2 == 1 ~ "White",
+           race2 == 2 ~ "Black",
+           race2 == 3 ~ "Other",
+           T ~ NA_character_),
+         across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
+predictors <- demographics %>%
+  select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion)
 ```
 
 # Intermodal Coupling
@@ -86,16 +106,18 @@ for(i in 1:nrow(input_filepaths)) {
                         subject_files,
                         settings$mask_path,
                         settings$output_dir,
-                        out_name)
+                        out_name,
+                        settings$fwhm,
+                        settings$propMiss)
   bash_file[i] <- paste(bsub_args, Rscript_args)
-  # system2("Rscript", args = c("R/batch_scripts/01_perform_imco.R",
-  #                             subject_files,
-  #                             settings$mask_path,
-  #                             settings$output_dir,
-  #                             out_name
-  # ))
 }
 
 write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
+#RUNOTHER
+```
+
+# Calculate p-values
+```{r}
+
 ```
 

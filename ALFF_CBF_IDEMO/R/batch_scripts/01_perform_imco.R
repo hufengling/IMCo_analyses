@@ -32,8 +32,8 @@ change_mode <- function(mode) {
              mask,
              out_dir = mode_output_dir,
              out_name = out_name,
-             fwhm = 3,
-             propMiss = 0.9,
+             fwhm = fwhm,
+             propMiss = propMiss,
              pcaType = pca_type, 
              matrixType = matrix_type
         )
