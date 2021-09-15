@@ -118,6 +118,132 @@ write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
 
 # Calculate p-values
 ```{r}
+load_images <- function(dir, mask) {
+  files <- list.files(dir)
+  file_paths <- file.path(dir, files)
+  image_vector_list <- lapply(file_paths,
+                              function(x, mask) {
+                                image <- extrantsr::check_ants(x)
+                                image[mask == 0] <- NA
+                                image_vector <- image %>% as.numeric()
+                                image_vector_no_NAs <- image_vector[!is.na(image_vector)]
+                                return(image_vector_no_NAs)
+                              },
+                              mask = mask
+  )
+  return(image_vector_list)
+}
 
+transpose_list <- function(list) {
+  matrix <- list %>%
+    unlist() %>%
+    matrix(byrow = TRUE, nrow = length(list))
+  transposed_list <- lapply(seq_len(ncol(matrix)), function(i) matrix[, i])
+  return(transposed_list)
+}
+
+make_descriptive_images <- function(voxel_vector_list) {
+  descriptive_vector <- lapply(voxel_vector_list, function(voxel_vector) {
+    voxel_mean <- sum(voxel_vector)/length(voxel_vector)
+    voxel_variance <- var(voxel_vector)
+    
+    return(c(voxel_mean, voxel_variance))
+  }) %>% unlist()
+  
+  voxel_mean_vector <- descriptive_vector[c(T, F)]
+  voxel_variance_vector <- descriptive_vector[c(F, T)]
+  
+  return(list(voxel_mean_vector, voxel_variance_vector))
+}
+
+get_pvals_by_voxel <- function(voxel_vector, predictors) {
+  if (length(voxel_vector) != nrow(predictors)) {
+    stop("n doesn't match")
+  }
+  
+  regression <- lm(voxel_vector ~
+                     sex + ageAtScan1 +
+                     race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                   data = predictors) %>%
+    summary()
+  reg_pvals <- regression$coefficients[c(2, 3), 4]
+  
+  interaction_regression <- lm(voxel_vector ~
+                                 sex * ageAtScan1 +
+                                 race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                               data = predictors) %>%
+    summary()
+  int_pvals <- interaction_regression$coefficients[8, 4]
+  
+  gam_regression_interaction <- gam(voxel_vector ~ ageAtScan1 + sex + ageAtScan1*sex +
+                                      s(ageAtScan1, by = sex, k = 25, fx = TRUE) +
+                                      race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                                    data = predictors)
+  gam_regression_base <- gam(voxel_vector ~ ageAtScan1 + sex +
+                               s(ageAtScan1, k = 25, fx = TRUE) +
+                               race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                             data = predictors)
+  gam_pvals <- anova(gam_regression_interaction, gam_regression_base, test="LRT")$Pr[2]
+  
+  pvals <- c(reg_pvals, int_pvals, gam_pvals)
+  return(pvals)
+}
+
+write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
+  mask_indices <- which(as.array(mask) > 0)
+  reference <- extrantsr::check_ants(file.path(dir, list.files(dir)[[1]]))
+  file_name <- (dir %>% str_split("/"))[[1]][2]
+  
+  if (is_descriptive) {
+    descriptive_dir <- file.path(settings$output_dir, "niftis/descriptive")
+    dir.create(descriptive_dir, showWarnings = FALSE)
+    names <- c("_mean", "_variance")
+    for (i in 1:length(image_list)) {
+      descriptive_image <- make_ants_image(image_list[[i]], mask_indices, reference)
+      ANTsRCore::antsImageWrite(
+        descriptive_image,
+        file.path(
+          descriptive_dir,
+          paste0(file_name, names[i], ".nii.gz")))
+    }
+    
+    return(NULL)
+  }
+  
+  for (i in 1:length(image_list)) {
+    pval_image <- make_ants_image(image_list[[i]], mask_indices, reference)
+    ANTsRCore::antsImageWrite(
+      pval_image,
+      file.path(
+        output_dir, "niftis/pvals",
+        paste0(file_name, "_pval_", i, ".nii.gz")
+      )
+    )
+  }
+  
+  return(NULL)
+}
+
+analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
+  mask <- extrantsr::check_ants(mask)
+  image_vector_list <- load_images(coupled_dir, mask)
+  voxel_vector_list <- transpose_list(image_vector_list)
+  descriptive_list <- make_descriptive_images(voxel_vector_list)
+  pvalbyvoxel_list <- parallel::mclapply(voxel_vector_list,
+                                         get_pvals_by_voxel,
+                                         predictors = predictors,
+                                         mc.cores = cores)
+  pvalbycoef_list <- transpose_list(pvalbyvoxel_list)
+  
+  write_pvals(descriptive_list, mask, coupled_dir, is_descriptive = TRUE)
+  write_pvals(pvalbycoef_list, mask, coupled_dir)
+  
+  return(NULL)
+}
+
+analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = 16)
 ```
 
