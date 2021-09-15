@@ -14,7 +14,7 @@ library(parallel)
 library(here)
 ```
 
-## Input nifti names
+## Load niftis
 ```{r}
 idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv"))
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
@@ -40,14 +40,10 @@ write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 rm(common_pts, idemo, idemo_health, idemo_qa)
 ```
 
-## Global Settings
+## Write settings
 ```{r}
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
-nifti_dir <- file.path(input_dir, 
-                       list("niftis/alff",
-                            "niftis/cbf",
-                            "niftis/idemo"))
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 batch_script_dir <- here("R/batch_scripts")
 fwhm <- 3
@@ -56,7 +52,6 @@ propMiss <- 0.9
 settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv"),
                  output_dir = output_dir,
                  input_dir = input_dir,
-                 nifti_dir = nifti_dir,
                  batch_script_dir = batch_script_dir,
                  mask_path = mask_path,
                  fwhm = fwhm,
@@ -65,10 +60,10 @@ input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
 
 save(settings, file = file.path(input_dir, "csvs/settings.RData"))
 
-rm(output_dir, input_dir, nifti_dir, mask_path, batch_script_dir, fwhm, propMiss)
+rm(output_dir, input_dir, mask_path, batch_script_dir, fwhm, propMiss)
 ```
 
-## Loading non-nifti PNC data
+## Load non-nifti PNC data
 ```{r}
 demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")) %>% 
   rename(subj_num = id)
@@ -91,7 +86,7 @@ predictors <- demographics %>%
 rm(demographics)
 ```
 
-# Intermodal Coupling
+# Write IMCo bash script
 ```{r}
 bash_file <- rep(0, nrow(input_filepaths))
 for(i in 1:nrow(input_filepaths)) {
@@ -121,6 +116,8 @@ write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
 ```
 
 # Calculate p-values
+
+## Functions
 ```{r}
 load_images <- function(dir, mask) {
   files <- list.files(dir)
@@ -197,9 +194,8 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
       descriptive_image <- make_ants_image(image_list[[i]], mask_indices, reference)
       ANTsRCore::antsImageWrite(
         descriptive_image,
-        file.path(
-          descriptive_dir,
-          paste0(file_name, names[i], ".nii.gz")))
+        file.path(descriptive_dir,
+                  paste0(file_name, names[i], ".nii.gz")))
     }
     
     return(NULL)
@@ -209,9 +205,8 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
     pval_image <- make_ants_image(image_list[[i]], mask_indices, reference)
     ANTsRCore::antsImageWrite(
       pval_image,
-      file.path(
-        settings$output_dir, "niftis/pvals",
-        paste0(file_name, "_pval_", i, ".nii.gz")
+      file.path(settings$output_dir, "niftis/pvals/raw",
+                paste0(file_name, "_pval_", i, ".nii.gz")
       )
     )
   }
@@ -235,7 +230,10 @@ analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
   
   return(NULL)
 }
+```
 
+## Run
+```{r}
 analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
                        mask = settings$mask_path,
                        predictors = predictors,
@@ -244,5 +242,83 @@ analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coup
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = 16)
+```
+
+
+# Perform multiple comparisons
+
+## Functions
+```{r}
+get_file_name <- function(file_path, pval_name) {
+  split_path <- file_path %>% str_split("/")
+  full_name <- split_path[[1]][length(split_path[[1]])]
+  file_name <- full_name %>% str_remove(".nii.gz")
+  
+  if (!is.null(pval_name)) {
+    file_name <- file_name %>% sub("pval.*", pval_name, .)
+  }
+  
+  return(file_name)
+}
+
+process_pval_image <- function(file_path, mask, out_dir, pval_name) {
+  mask <- extrantsr::check_ants(mask)
+  file_name <- get_file_name(file_path, pval_name)
+  pval_image <- check_ants(file_path)
+  pval_numeric <- pval_image %>% as.numeric()
+  pval_numeric_clean <- pval_numeric[pval_numeric != 0]
+  bonferroni_adjusted <- p.adjust(pval_numeric_clean, method = "bonferroni")
+  fdr_adjusted <- p.adjust(pval_numeric_clean, method = "fdr")
+  
+  mask_indices <- which(as.array(mask) > 0)
+  
+  unadjusted <- convert_to_ants(pval_numeric_clean, 0.05, mask_indices, pval_image)
+  bonferroni <- convert_to_ants(bonferroni_adjusted, 0.05, mask_indices, pval_image)
+  fdr_image_0.05 <- convert_to_ants(fdr_adjusted, 0.05, mask_indices, pval_image)
+  
+  dir.create(out_dir, showWarnings = FALSE)
+  
+  antsImageWrite(unadjusted, file.path(out_dir, paste0(file_name, "_unadjusted.nii.gz")))
+  antsImageWrite(bonferroni, file.path(out_dir, paste0(file_name, "_bonferroni.nii.gz")))
+  antsImageWrite(fdr_image_0.05, file.path(out_dir, paste0(file_name, "_fdr05.nii.gz")))
+  
+  return(NULL)
+}
+
+convert_to_ants <- function(adjusted_pvals, threshold, mask_indices, reference) {
+  adjusted_pvals[adjusted_pvals > threshold] <- 0
+  adjusted_pvals[adjusted_pvals != 0] <- 1
+  
+  adjusted_image <- make_ants_image(adjusted_pvals, mask_indices, reference)
+  
+  return(adjusted_image)
+}
+
+name_pvals <- function(pval_files, pval_names) {
+  lapply(pval_files,
+         function(pval_file, pval_names) {
+           pval_num <- str_extract(pval_file, ".\\.nii\\.gz") %>%
+             str_remove("\\.nii\\.gz") %>%
+             as.numeric()
+           pval_names[pval_num]
+         },
+         pval_names = pval_names)
+}
+```
+
+## Run
+```{r}
+raw_pvals_dir <- file.path(settings$output_dir, "niftis/pvals/raw")
+
+raw_pval_files <- file.path(raw_pvals_dir, list.files(raw_pvals_dir, ".nii.gz"))
+pval_names <- c("sex", "age", "sex-age")
+pval_name_list <- name_pvals(raw_pval_files, pval_names)
+
+mapply(process_pval_image,
+       file_path = raw_pval_files,
+       pval_name = pval_name_list,
+       MoreArgs = list(
+         mask = settings$mask_path,
+         out_dir = file.path(settings$output_dir, "niftis/pvals/adjusted")))
 ```
 
