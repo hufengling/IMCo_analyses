@@ -10,6 +10,7 @@ library(tidyverse)
 library(ANTsRCore)
 library(extrantsr)
 library(IMCo)
+library(parallel)
 library(here)
 ```
 
@@ -41,8 +42,6 @@ rm(common_pts, idemo, idemo_health, idemo_qa)
 
 ## Global Settings
 ```{r}
-input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
-
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
 nifti_dir <- file.path(input_dir, 
@@ -62,8 +61,11 @@ settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepat
                  mask_path = mask_path,
                  fwhm = fwhm,
                  propMiss = propMiss)
+input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
 
 save(settings, file = file.path(input_dir, "csvs/settings.RData"))
+
+rm(output_dir, input_dir, nifti_dir, mask_path, batch_script_dir, fwhm, propMiss)
 ```
 
 ## Loading non-nifti PNC data
@@ -85,6 +87,8 @@ demographics <- right_join(demographics, input_filepaths,
          across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
 predictors <- demographics %>%
   select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion)
+
+rm(demographics)
 ```
 
 # Intermodal Coupling
@@ -175,24 +179,15 @@ get_pvals_by_voxel <- function(voxel_vector, predictors) {
     summary()
   int_pvals <- interaction_regression$coefficients[8, 4]
   
-  gam_regression_interaction <- gam(voxel_vector ~ ageAtScan1 + sex + ageAtScan1*sex +
-                                      s(ageAtScan1, by = sex, k = 25, fx = TRUE) +
-                                      race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
-                                    data = predictors)
-  gam_regression_base <- gam(voxel_vector ~ ageAtScan1 + sex +
-                               s(ageAtScan1, k = 25, fx = TRUE) +
-                               race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
-                             data = predictors)
-  gam_pvals <- anova(gam_regression_interaction, gam_regression_base, test="LRT")$Pr[2]
-  
-  pvals <- c(reg_pvals, int_pvals, gam_pvals)
+  pvals <- c(reg_pvals, int_pvals)
   return(pvals)
 }
 
 write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
   mask_indices <- which(as.array(mask) > 0)
   reference <- extrantsr::check_ants(file.path(dir, list.files(dir)[[1]]))
-  file_name <- (dir %>% str_split("/"))[[1]][2]
+  file_name <- (dir %>% str_split("/"))[[1]]
+  file_name <- file_name[length(file_name)]
   
   if (is_descriptive) {
     descriptive_dir <- file.path(settings$output_dir, "niftis/descriptive")
@@ -215,7 +210,7 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
     ANTsRCore::antsImageWrite(
       pval_image,
       file.path(
-        output_dir, "niftis/pvals",
+        settings$output_dir, "niftis/pvals",
         paste0(file_name, "_pval_", i, ".nii.gz")
       )
     )
@@ -242,6 +237,10 @@ analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
 }
 
 analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = 16)
+analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = 16)
