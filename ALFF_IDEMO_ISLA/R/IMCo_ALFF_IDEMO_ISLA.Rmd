@@ -1,5 +1,5 @@
 ---
-title: "IMCo Validation - Three Modality - ALFF_CBF_IDEMO"
+title: "IMCo_ALFF_ISLA_IDEMO"
 author: "Fengling Hu"
 output: html_document
 ---
@@ -20,24 +20,26 @@ idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv")
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
 idemo_health <- read_csv(here("input/csvs/idemodata/n1601_health_20170421.csv"))
 pnc_demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv"))
+isla_subj <- read_table(here("input/csvs/demographics/isla_subj.txt"), col_names = FALSE)
 
 idemo_qa <- idemo_qa %>% filter(idemoExcludeVoxelwise == 0)
 idemo <- idemo %>% filter(idemoBehHappyCorrectCount >= 8)
 idemo_health <- idemo_health %>% filter(ltnExcludev2 == 0)
 pnc_demographics <- pnc_demographics %>% rename(scanid = "id")
+isla_subj <- isla_subj %>% separate(X1, c("scanid", "file_root"), sep = "_")
 
-common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid)) %>%
+common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, isla_subj$scanid)) %>%
   as.data.frame() %>%
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
   mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .),
-         modality_2 = paste0(subj_num, "_asl_quant_ssT1Std.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf", .), 
+         modality_2 = paste0(subj_num, "_predictedGMD1.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf_isla", .), 
          modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo", .))
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
-rm(common_pts, idemo, idemo_health, idemo_qa)
+rm(common_pts, idemo, idemo_health, idemo_qa, isla_subj)
 ```
 
 ## Write settings
