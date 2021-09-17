@@ -46,6 +46,7 @@ rm(common_pts, idemo, idemo_health, idemo_qa, isla_subj)
 ```{r}
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
+nifti_dir <- "~/Documents/IMCo_analyses/input/niftis"
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 batch_script_dir <- here("R/batch_scripts")
 fwhm <- 3
@@ -54,6 +55,7 @@ propMiss <- 0.9
 settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv"),
                  output_dir = output_dir,
                  input_dir = input_dir,
+                 nifti_dir = nifti_dir,
                  batch_script_dir = batch_script_dir,
                  mask_path = mask_path,
                  fwhm = fwhm,
@@ -121,7 +123,7 @@ write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
 
 ## Functions
 ```{r}
-load_images <- function(dir, mask) {
+load_images <- function(dir, nifti_paths, mask) {
   files <- list.files(dir)
   file_paths <- file.path(dir, files)
   image_vector_list <- lapply(file_paths,
@@ -182,7 +184,7 @@ get_pvals_by_voxel <- function(voxel_vector, predictors) {
   return(pvals)
 }
 
-write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
+write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE, is_modality = FALSE) {
   mask_indices <- which(as.array(mask) > 0)
   reference <- extrantsr::check_ants(file.path(dir, list.files(dir)[[1]]))
   file_name <- (dir %>% str_split("/"))[[1]]
@@ -203,22 +205,25 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE) {
     return(NULL)
   }
   
+  if (is_modality) 
+    pval_output_dir <- file.path(settings$output_dir, "niftis/pvals/modality")
+  else
+    pval_output_dir <- file.path(settings$output_dir, "niftis/pvals/raw")
+  
   for (i in 1:length(image_list)) {
     pval_image <- make_ants_image(image_list[[i]], mask_indices, reference)
     ANTsRCore::antsImageWrite(
       pval_image,
-      file.path(settings$output_dir, "niftis/pvals/raw",
-                paste0(file_name, "_pval_", i, ".nii.gz")
-      )
-    )
+      file.path(pval_output_dir,
+                paste0(file_name, "_pval_", i, ".nii.gz")))
   }
   
   return(NULL)
 }
 
-analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
+analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_modality = FALSE) {
   mask <- extrantsr::check_ants(mask)
-  image_vector_list <- load_images(coupled_dir, mask)
+  image_vector_list <- load_images(nifti_dir, mask)
   voxel_vector_list <- transpose_list(image_vector_list)
   descriptive_list <- make_descriptive_images(voxel_vector_list)
   pvalbyvoxel_list <- parallel::mclapply(voxel_vector_list,
@@ -227,8 +232,8 @@ analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
                                          mc.cores = cores)
   pvalbycoef_list <- transpose_list(pvalbyvoxel_list)
   
-  write_pvals(descriptive_list, mask, coupled_dir, is_descriptive = TRUE)
-  write_pvals(pvalbycoef_list, mask, coupled_dir)
+  write_pvals(descriptive_list, mask, nifti_dir, is_descriptive = TRUE, is_modality)
+  write_pvals(pvalbycoef_list, mask, nifti_dir, is_modality)
   
   return(NULL)
 }
@@ -236,14 +241,19 @@ analyze_coupled_images <- function(coupled_dir, mask, predictors, cores = 2) {
 
 ## Run
 ```{r}
-analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
+analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = 16)
-analyze_coupled_images(coupled_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
+analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = 16)
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "alff"),
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = 16,
+                       is_modality = TRUE)
 ```
 
 
@@ -323,4 +333,297 @@ mapply(process_pval_image,
          mask = settings$mask_path,
          out_dir = file.path(settings$output_dir, "niftis/pvals/adjusted")))
 ```
+
+# Get p-value descriptive stats
+## Functions
+```{r}
+get_file_names <- function(pval_directory) {
+  pval_names <- file.path(pval_directory) %>%
+    list.files()
+  c(pval_names) %>% sub(".nii.gz", "", .)
+}
+
+load_pval_images <- function(pval_directory) {
+  pval_files <- file.path(pval_directory) %>% list.files(full.names = TRUE)
+  
+  check_ants(pval_files)
+}
+
+get_metadata <- function(pval_names, pval_directory) {
+  pval_files <- file.path(pval_directory) %>% list.files(full.names = TRUE)
+  
+  metadata_df <- pval_names %>%
+    str_split("_") %>%
+    as.data.frame() %>%
+    t() %>%
+    as.data.frame()
+  rownames(metadata_df) <- 1:nrow(metadata_df)
+  colnames(metadata_df) <- c("scaling", "matrix_type", "coefficient", "mc_correction")
+  
+  metadata_df <- metadata_df %>% mutate(file_paths = pval_files)
+  
+  metadata_df
+}
+
+get_descriptive_stats <- function(pval_image, gm_mask) {
+  total_voxels <- sum(gm_mask)
+  prop_sig <- sum(pval_image) / total_voxels
+  
+  data.frame(prop_sig)
+}
+
+process_pval_images <- function(pval_directory, gm_mask, image_format = c("ants", "nifti")) {
+  gm_mask <- check_ants(gm_mask)
+  pval_images <- load_pval_images(pval_directory)
+  pval_names <- get_file_names(pval_directory)
+  pval_metadata <- get_metadata(pval_names, pval_directory)
+  
+  pval_metadata_list <- split(pval_metadata, seq(nrow(pval_metadata)))
+  
+  descriptive_stats <- lapply(pval_images,
+                              get_descriptive_stats,
+                              gm_mask)
+  
+  descriptive_stats_df <- descriptive_stats %>%
+    unlist() %>%
+    as.matrix(byrow = T, ncol = ncol(pval_metadata)) %>%
+    as.data.frame()
+  names(descriptive_stats_df) <- c("prop_sig")
+  rownames(descriptive_stats_df) <- 1:nrow(pval_metadata)
+  
+  pval_info <- cbind(pval_metadata, descriptive_stats_df)
+  
+  if (image_format == "nifti") {
+    pval_images <- lapply(pval_images, ants2oro)
+  }
+  
+  list(pval_info, pval_images)
+}
+
+view_itksnap <- function(pval_info,
+                         pval_mask_filter = "brain",
+                         directory_filter = NULL,
+                         segmentation = NULL,
+                         scaling_filter = NULL,
+                         fwhm_filter = NULL,
+                         coefficient_filter = NULL,
+                         mc_correction_filter = NULL,
+                         pca_mask_filter = NULL,
+                         show_image = TRUE) {
+  if (class(segmentation) == "antsImage") {
+    segmentation <- ants2oro(segmentation)
+  }
+  
+  tmp <- pval_info
+  
+  if (!is.null(directory_filter)) {
+    tmp <- tmp %>% filter(directory == directory_filter)
+  }
+  if (!is.null(pval_mask_filter)) {
+    tmp <- tmp %>% filter(pval_mask == pval_mask_filter)
+  }
+  if (!is.null(scaling_filter)) {
+    tmp <- tmp %>% filter(scaling == scaling_filter)
+  }
+  if (!is.null(fwhm_filter)) {
+    tmp <- tmp %>% filter(fwhm == fwhm_filter)
+  }
+  if (!is.null(coefficient_filter)) {
+    tmp <- tmp %>% filter(coefficient == coefficient_filter)
+  }
+  if (!is.null(mc_correction_filter)) {
+    tmp <- tmp %>% filter(mc_correction == mc_correction_filter)
+  }
+  if (!is.null(pca_mask_filter)) {
+    tmp <- tmp %>% filter(pca_mask == pca_mask_filter)
+  }
+  
+  print(tmp$prop_sig)
+  print(tmp$file_path)
+  
+  
+  file_paths <- tmp$file_paths
+  
+  if (show_image) {
+    if (length(file_paths) == 2) {
+      itksnap(file_paths[1], overlay = file_paths[2], segmentation, verbose = F)
+    } else {
+      for (i in 1:length(file_paths)) {
+        itksnap(file_paths[i], segmentation = segmentation, verbose = F)
+      }
+    }
+  }
+  
+  return(NULL)
+}
+```
+
+## Run
+```{r}
+pval_dir <- file.path(settings$output_dir, "niftis/pvals")
+
+pval_image_stats <- process_pval_images(file.path(pval_dir, "adjusted"), settings$mask_path, image_format = "nifti")
+pval_stats_df <- pval_image_stats[[1]]
+view_itksnap(pval_stats_df,
+             pval_mask_filter = NULL,
+             directory_filter = "adjusted_gm",
+             segmentation = gm_mask,
+             scaling_filter = "unscaled",
+             fwhm_filter = "fwhm3",
+             coefficient_filter = NULL,
+             mc_correction_filter = "fdr05",
+             pca_mask_filter = "gm-mask",
+             show_image = TRUE)
+
+write_csv(pval_stats_df, file.path(settings$output_dir, "csvs/pval_descriptive_stats.csv"))
+```
+
+# Generate barcharts
+## Functions
+```{r}
+get_prop_sig <- function(file_paths, file_labels, atlas, mask) {
+  pval_masks <- check_ants(file_paths)
+  mask <- check_ants(mask)
+  
+  masked_atlas <- atlas * mask
+  network_ids <- masked_atlas[masked_atlas != 0] %>%
+    as.factor() %>%
+    summary() %>%
+    names()
+  
+  common_mask <- atlas * mask
+  common_mask[common_mask != 0] <- 1
+  
+  sig_voxel_images <- lapply(pval_masks, function(pval_mask) pval_mask * masked_atlas)
+  nonsig_voxel_images <- lapply(pval_masks, function(pval_mask) (-pval_mask + 1) * masked_atlas)
+  
+  for (i in 1:4) {
+    sig_sum <- sum(sig_voxel_images[[i]] != 0)
+    nonsig_sum <- sum(nonsig_voxel_images[[i]] != 0)
+    if (sum(common_mask) != nonsig_sum + sig_sum) {
+      stop()
+    }
+  }
+  
+  summaries <- mapply(
+    function(sig_voxel_image, nonsig_voxel_image, file_label, network_id) {
+      sig_summary <- sig_voxel_image[sig_voxel_image != 0] %>%
+        as.factor() %>%
+        summary() %>%
+        as.data.frame() %>%
+        rownames_to_column() %>%
+        rename(sig_counts = ".")
+      
+      nonsig_summary <- nonsig_voxel_image[nonsig_voxel_image != 0] %>%
+        as.factor() %>%
+        summary() %>%
+        as.data.frame() %>%
+        rownames_to_column() %>%
+        rename(nonsig_counts = ".")
+      
+      map_name <- rep(file_label, length(network_ids))
+      
+      df <- data.frame(network_ids) %>%
+        cbind(map_name) %>%
+        left_join(sig_summary, by = c("network_ids" = "rowname")) %>%
+        left_join(nonsig_summary, by = c("network_ids" = "rowname"))
+      
+      return(df)
+    },
+    sig_voxel_images, nonsig_voxel_images, file_labels,
+    MoreArgs = list(network_ids),
+    SIMPLIFY = FALSE)
+  
+  summaries_df <- bind_rows(summaries) %>%
+    mutate(proportion = sig_counts / (sig_counts + nonsig_counts),
+           se = sqrt(proportion * (1 - proportion) / (sig_counts + nonsig_counts))
+    )
+  
+  return(summaries_df)
+}
+```
+
+## Run
+```{r}
+pvals_dir <- file.path(settings$output_dir, "niftis/pvals")
+pval_metadata <- read_csv(file.path(settings$output_dir, "csvs", "pval_descriptive_stats.csv"))
+yeo7 <- file.path(settings$input_dir, "references/atlases/7yeonetworkPNC.nii.gz") %>% check_ants()
+aal <- file.path(settings$input_dir, "references/atlases/AAL_atlas_PNC.nii.gz") %>% check_ants()
+
+
+# transform aal to yeo7-style mask
+aal_sym <- floor(aal/10) * 10
+
+all_indices <- unique(aal_sym)
+subcortical_indices <- c(4100, 4200, 7000, 7010, 7020, 7100) # What are the subcortical structures?
+
+excluded_indices <- all_indices[!all_indices %in% subcortical_indices]
+
+for(i in 1:length(excluded_indices)) {
+  aal_sym[aal_sym == excluded_indices[i]] <- 0
+}
+
+file_labels <- c("global_age", "global_sex", "unscaled_age", "unscaled_sex")
+
+# get file paths
+file_paths <- pval_metadata %>%
+  filter(coefficient == "sex" | coefficient == "age",
+         mc_correction == "fdr05") %>%
+  pull(file_paths)
+
+yeo7_df <- get_prop_sig(file_paths, file_labels, yeo7, settings$mask_path)
+yeo7_barplot <- ggplot(yeo7_df, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "PCA on Yeo7") +
+  scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal Attention", "Ventral Attention", "Limbic", "Frontoparietal", "Default")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)); yeo7_barplot
+ggsave(plot = yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+
+aal_sym_df <- get_prop_sig(file_paths, file_labels, aal_sym, settings$mask_path)
+aal_barplot <- ggplot(aal_sym_df, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "PCA on AAL") +
+  scale_x_discrete(labels = c("Hippocampus", "Amygdala", "Caudate", "Putamen", "Pallidum", "Thalamus")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)); aal_barplot
+ggsave(plot = aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
+
+
+# ---------------------------------------------------
+
+raw_file_paths <- file.path(dir, "adjusted_gm") %>%
+  list.files()
+raw_file_path_select <- raw_file_paths %>%
+  (function(x) grepl("alff|cbf", x) &
+     grepl("_sex_|_age_", x) &
+     grepl("bonferroni", x))
+raw_file_paths <- file.path(file.path(dir, "adjusted_gm"), raw_file_paths[raw_file_path_select])
+raw_file_labels <- c("alff_age", "alff_sex", "cbf_age", "cbf_sex")
+
+yeo7_df_raw <- get_prop_sig(raw_file_paths, raw_file_labels, yeo7, gm_mask)
+ggplot(yeo7_df_raw, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "Raw on Yeo7") +
+  theme_classic()
+
+aal_sym_df_raw <- get_prop_sig(raw_file_paths, raw_file_labels, aal_sym, gm_mask)
+ggplot(aal_sym_df_raw, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "Raw on AAL") +
+  theme_classic()
+```
+
 
