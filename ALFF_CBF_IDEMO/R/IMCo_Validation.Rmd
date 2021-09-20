@@ -37,30 +37,32 @@ input_filepaths <- common_pts %>%
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
-rm(common_pts, idemo, idemo_health, idemo_qa)
+rm(common_pts, idemo, idemo_health, idemo_qa, pnc_demographics)
 ```
 
 ## Write settings
 ```{r}
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
+nifti_dir <- "~/Documents/IMCo_analyses/input/niftis"
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 batch_script_dir <- here("R/batch_scripts")
 fwhm <- 3
-propMiss <- 0.9
+prop_miss <- 0.9
 
 settings <- list(input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv"),
                  output_dir = output_dir,
                  input_dir = input_dir,
+                 nifti_dir = nifti_dir,
                  batch_script_dir = batch_script_dir,
                  mask_path = mask_path,
                  fwhm = fwhm,
-                 propMiss = propMiss)
+                 prop_miss = prop_miss)
 input_filepaths <- read_csv(file.path(input_dir, "csvs/input_filepaths.csv"))
 
 save(settings, file = file.path(input_dir, "csvs/settings.RData"))
 
-rm(output_dir, input_dir, mask_path, batch_script_dir, fwhm, propMiss)
+rm(output_dir, input_dir, nifti_dir, mask_path, batch_script_dir, fwhm, prop_miss)
 ```
 
 ## Load non-nifti PNC data
@@ -88,8 +90,11 @@ rm(demographics)
 
 # Write IMCo bash script
 ```{r}
-bash_file <- rep(0, nrow(input_filepaths))
-for(i in 1:nrow(input_filepaths)) {
+bash_file <- rep(0, 2)
+for(i in 1:2) {
+# bash_file <- rep(0, nrow(input_filepaths))
+# for(i in 1:nrow(input_filepaths)) {
+  
   line <- input_filepaths[i, ]
   out_name <- line[1]
   subject_files <- paste(line[1, 2], line[1, 3], line[1, 4], sep = ",")
@@ -107,12 +112,14 @@ for(i in 1:nrow(input_filepaths)) {
                         settings$output_dir,
                         out_name,
                         settings$fwhm,
-                        settings$propMiss)
+                        settings$prop_miss)
   bash_file[i] <- paste(bsub_args, Rscript_args)
 }
 
 write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
 #RUNOTHER
+
+rm(line, out_name, bsub_args, i, Rscript_args, subject_files)
 ```
 
 # Calculate p-values

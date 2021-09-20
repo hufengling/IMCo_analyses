@@ -11,7 +11,7 @@ mask <- args[2]
 output_dir <- args[3]
 out_name <- args[4]
 fwhm <- args[5] %>% as.numeric()
-propMiss <- args[6]
+prop_miss <- args[6] %>% as.numeric()
 
 change_mode <- function(mode) {
         if (mode == "global_wcov") {
@@ -33,9 +33,9 @@ change_mode <- function(mode) {
              out_dir = mode_output_dir,
              out_name = out_name,
              fwhm = fwhm,
-             propMiss = propMiss,
-             pcaType = pca_type,
-             matrixType = matrix_type
+             prop_miss = prop_miss,
+             pca_type = pca_type,
+             matrix_type = matrix_type
         )
 
         return(NULL)
