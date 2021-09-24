@@ -3,15 +3,15 @@ library(stringr)
 library(magrittr)
 
 args <- commandArgs(trailingOnly = TRUE)
-files <- args[1] %>% 
-        str_split(pattern = ",") %>% 
-        unlist() %>% 
+files <- args[1] %>%
+        str_split(pattern = ",") %>%
+        unlist() %>%
         as.list()
 mask <- args[2]
 output_dir <- args[3]
 out_name <- args[4]
-fwhm <- args[5]
-propMiss <- args[6]
+fwhm <- args[5] %>% as.numeric()
+prop_miss <- args[6] %>% as.numeric()
 
 change_mode <- function(mode) {
         if (mode == "global_wcov") {
@@ -28,14 +28,14 @@ change_mode <- function(mode) {
         mode_output_dir <- file.path(output_dir, "niftis/coupled", path)
         dir.create(mode_output_dir, showWarnings = FALSE, recursive = TRUE)
         
-        imco(files, 
+        imco(files,
              mask,
              out_dir = mode_output_dir,
              out_name = out_name,
              fwhm = fwhm,
-             propMiss = propMiss,
-             pcaType = pca_type, 
-             matrixType = matrix_type
+             prop_miss = prop_miss,
+             pca_type = pca_type,
+             matrix_type = matrix_type
         )
         
         return(NULL)
@@ -43,4 +43,3 @@ change_mode <- function(mode) {
 
 change_mode("global_wcov")
 change_mode("unscaled_wcor")
-

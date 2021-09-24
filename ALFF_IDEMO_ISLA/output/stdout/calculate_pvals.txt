@@ -1,0 +1,70 @@
+Sender: LSF System <jszostek@pennsive05>
+Subject: Job 10749360: <calculate_pvals> in cluster <PMACS-SCC> Exited
+
+Job <calculate_pvals> was submitted from host <takim> by user <fengling> in cluster <PMACS-SCC> at Fri Sep 24 10:01:36 2021
+Job was executed on host(s) <pennsive05>, in queue <taki_normal>, as user <fengling> in cluster <PMACS-SCC> at Fri Sep 24 10:01:37 2021
+</home/fengling> was used as the home directory.
+</home/fengling/Documents/IMCo_analyses/ALFF_IDEMO_ISLA/R/batch_scripts> was used as the working directory.
+Started at Fri Sep 24 10:01:37 2021
+Terminated at Fri Sep 24 10:03:23 2021
+Results reported at Fri Sep 24 10:03:23 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+Rscript /home/fengling/Documents/IMCo_analyses/ALFF_IDEMO_ISLA/R/batch_scripts/02_calculate_pvals.R /home/fengling/Documents/IMCo_analyses/ALFF_IDEMO_ISLA/input/csvs/settings.RData /home/fengling/Documents/IMCo_analyses/ALFF_IDEMO_ISLA/output/niftis/coupled/global_wcov 8 NA NA
+------------------------------------------------------------
+
+TERM_MEMLIMIT: job killed after reaching LSF memory usage limit.
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   376.39 sec.
+    Max Memory :                                 10000 MB
+    Average Memory :                             4851.33 MB
+    Total Requested Memory :                     10000.00 MB
+    Delta Memory :                               0.00 MB
+    Max Swap :                                   -
+    Max Processes :                              11
+    Max Threads :                                108
+    Run time :                                   105 sec.
+    Turnaround time :                            107 sec.
+
+The output (if any) follows:
+
+
+Attaching package: ‘ANTsRCore’
+
+The following objects are masked from ‘package:extrantsr’:
+
+    origin, origin<-
+
+The following objects are masked from ‘package:stats’:
+
+    sd, var
+
+The following objects are masked from ‘package:base’:
+
+    all, any, apply, max, min, prod, range, sum
+
+
+── Column specification ────────────────────────────────────────────────────────
+cols(
+  sex = col_character(),
+  ageAtScan1 = col_double(),
+  race2 = col_character(),
+  pcaslRelMeanRMSMotion = col_double(),
+  restRelMeanRMSMotion = col_double()
+)
+
+
+
+
+
+
+
+
+
+Execution halted

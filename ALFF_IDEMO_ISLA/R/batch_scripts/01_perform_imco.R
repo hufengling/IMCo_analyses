@@ -13,6 +13,7 @@ out_name <- args[4]
 fwhm <- args[5] %>% as.numeric()
 prop_miss <- args[6] %>% as.numeric()
 
+print(paste("FWHM:", fwhm, is.numeric(fwhm)))
 change_mode <- function(mode) {
         if (mode == "global_wcov") {
                 path <- "global_wcov"
