@@ -1,27 +1,17 @@
 library(magrittr)
 library(readr)
 library(extrantsr)
-library(ANTsRCore)
+library(stringr)
+library(IMCo)
 
-args <- commandArgs(trailingOnly = TRUE)
-load(args[1]) #load settings.RData
-nifti_dir <- args[2]
-mask <- settings$mask_path
+load("/home/fengling/Documents/IMCo_analyses/ALFF_IDEMO_ISLA/input/csvs/settings.RData") #load settings.RData
 predictors <- read_csv(settings$predictors_path)
-cores <- args[3]
-if(args[4] != "NA") {
-  is_modality <- TRUE
-  input_filepaths <- read_csv(settings$input_filepaths_path)
-  col_num <- as.numeric(args[5]) + 1
-  file_paths <- input_filepaths[, col_num] %>% unlist() %>% as.list()
-} else {
-  is_modality <- FALSE
-  file_paths <- ""
-}
+input_filepaths <- read_csv(settings$input_filepaths_path)
+cores <- 16
 
 # Functions
-load_images <- function(dir, mask, file_paths = "") {
-  if (file_paths != "") {
+load_images <- function(dir, mask, file_paths) {
+  if (!is.null(file_paths)) {
     file_paths <- file_paths
   } else {
     files <- list.files(dir)
@@ -91,7 +81,7 @@ get_pvals_by_voxel <- function(voxel_vector, predictors) {
   return(pvals)
 }
 
-write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE, is_modality = FALSE) {
+write_pvals <- function(image_list, mask, dir, is_descriptive, is_modality) {
   mask_indices <- which(as.array(mask) > 0)
   reference <- extrantsr::check_ants(file.path(dir, list.files(dir)[[1]]))
   file_name <- (dir %>% str_split("/"))[[1]]
@@ -112,10 +102,12 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE, is_modali
     return(NULL)
   }
 
-  if (is_modality)
-    pval_output_dir <- file.path(settings$output_dir, "niftis/pvals/modality")
-  else
+  if (is_modality) {
+    pval_output_dir <- file.path(settings$output_dir, "niftis/pvals/modality_raw")
+  }
+  else {
     pval_output_dir <- file.path(settings$output_dir, "niftis/pvals/raw")
+  }
 
   for (i in 1:length(image_list)) {
     pval_image <- make_ants_image(image_list[[i]], mask_indices, reference)
@@ -128,12 +120,18 @@ write_pvals <- function(image_list, mask, dir, is_descriptive = FALSE, is_modali
   return(NULL)
 }
 
-analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_modality = FALSE, file_paths = "") {
+analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_modality, file_paths = NULL) {
   mask <- extrantsr::check_ants(mask)
 
+  cat("Loading images\n")
   image_vector_list <- load_images(nifti_dir, mask, file_paths)
   voxel_vector_list <- transpose_list(image_vector_list)
+
+  cat("Making descriptive images\n")
   descriptive_list <- make_descriptive_images(voxel_vector_list)
+
+  cat("Sending out voxel_vectors!\n")
+
   pvalbyvoxel_list <- parallel::mclapply(voxel_vector_list,
                                          get_pvals_by_voxel,
                                          predictors = predictors,
@@ -143,16 +141,40 @@ analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_mo
   #                            predictors = predictors)
   pvalbycoef_list <- transpose_list(pvalbyvoxel_list)
 
+  cat("Writing pvals!\n")
   write_pvals(descriptive_list, mask, nifti_dir, is_descriptive = TRUE, is_modality)
-  write_pvals(pvalbycoef_list, mask, nifti_dir, is_modality)
+  write_pvals(pvalbycoef_list, mask, nifti_dir, is_descriptive = FALSE, is_modality)
 
   return(NULL)
 }
 
 # Run
-analyze_coupled_images(nifti_dir = nifti_dir,
-                       mask = mask,
+analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
+                       mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
-                       is_modality = is_modality,
-                       file_paths = file_paths)
+                       is_modality = FALSE)
+analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = cores,
+                       is_modality = FALSE)
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "alff"), #TOCHANGE
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = cores,
+                       is_modality = TRUE,
+                       file_paths = input_filepaths$modality_1 %>% as.list())
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "idemo"), #TOCHANGE
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = cores,
+                       is_modality = TRUE,
+                       file_paths = input_filepaths$modality_2 %>% as.list())
+
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "cbf_isla"), #TOCHANGE
+                       mask = settings$mask_path,
+                       predictors = predictors,
+                       cores = cores,
+                       is_modality = TRUE,
+                       file_paths = input_filepaths$modality_3 %>% as.list())

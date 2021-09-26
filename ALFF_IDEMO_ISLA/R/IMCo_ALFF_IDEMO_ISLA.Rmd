@@ -654,7 +654,7 @@ preprocess_for_spin_test <- function(file_paths = NULL, atlas_name = c("", "yeo7
       atlas <- check_ants(file.path(settings$input_dir, "references/atlases/7yeonetworkPNC.nii.gz"))
       atlas_output_dir <- "yeo7_regions"
     }
-    #TODO BUG
+
     if (atlas_name == "aal") {
       atlas <- check_ants(file.path(settings$input_dir, "references/atlases/AAL_atlas_PNC.nii.gz"))
       atlas_output_dir <- "aal_regions"
