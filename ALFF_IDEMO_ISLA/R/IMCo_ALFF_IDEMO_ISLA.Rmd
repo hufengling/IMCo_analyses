@@ -35,11 +35,11 @@ common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health
 
 input_filepaths <- common_pts %>% 
   mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .),
-         modality_2 = paste0(subj_num, "_predictedGMD1.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf_isla", .), 
+         modality_2 = paste0(subj_num, "_predictedGMD1.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-isla", .), 
          modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo", .))
 
 input_filepaths$subj_num <- as.numeric(input_filepaths$subj_num)
-  
+
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
 rm(pnc_demographics, common_pts, idemo, idemo_health, idemo_qa, isla_subj)
@@ -126,69 +126,17 @@ for(i in 1:nrow(input_filepaths)) {
 }
 
 write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
-#RUNOTHER
+#RUNOTHER here("R/batch_scripts/01_commands.sh") on login node
+#Make sure to move 01_perform_imco.R into new directory
 
 rm(bash_file, i, line, out_name, subject_files, bsub_args, Rscript_args)
 ```
 
 # Write calculate_pvals bash script
 ```{r}
-cores <- 8
-global_wcov <- c(settings$settings_path, file.path(settings$output_dir, "niftis/coupled/global_wcov"), cores, NA, NA)
-unscaled_wcor <- c(settings$settings_path, file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"), cores, NA, NA)
-alff <- c(settings$settings_path, file.path(settings$nifti_dir, "alff"), cores, TRUE, 1)
-idemo <- c(settings$settings_path, file.path(settings$nifti_dir, "idemo"), cores, TRUE, 2)
-cbf_isla <- c(settings$settings_path, file.path(settings$nifti_dir, "cbf_isla"), cores, TRUE, 3)
-
-pvals_to_calculate <- list(global_wcov, unscaled_wcor, alff, idemo, cbf_isla)
-
-bash_file <- rep(0, length(pvals_to_calculate))
-for(i in 1:length(pvals_to_calculate)) {
-  to_analyze <- pvals_to_calculate[[i]]
-  
-  Rscript_args <- paste("Rscript", file.path(settings$batch_script_dir, "02_calculate_pvals.R"),
-                        to_analyze[1],
-                        to_analyze[2],
-                        to_analyze[3],
-                        to_analyze[4],
-                        to_analyze[5])
-  bash_file[i] <- paste(Rscript_args)
-}
-
-write_lines(bash_file, file.path(settings$batch_script_dir, "02_commands.sh"))
-#RUNOTHER
+#RUNOTHER here("R/batch_scripts/02_calculate_pvals.R) on interactive server
+#Make sure to move 02_calculate_pvals.R into new directory and change #TOCHANGE
 ```
-
-## Run
-```{r}
-analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/global_wcov"),
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = 8)
-analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = 8)
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "alff"), #TOCHANGE
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = 8,
-                       is_modality = TRUE,
-                       file_paths = input_filepaths$modality_1 %>% as.list())
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "idemo"), #TOCHANGE
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = 8,
-                       is_modality = TRUE,
-                       file_paths = input_filepaths$modality_2 %>% as.list())
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "cbf_isla"), #TOCHANGE
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = 8,
-                       is_modality = TRUE,
-                       file_paths = input_filepaths$modality_3 %>% as.list())
-```
-
 
 # Perform multiple comparisons
 
@@ -249,22 +197,29 @@ name_pvals <- function(pval_files, pval_names) {
          },
          pval_names = pval_names)
 }
+
+perform_mc <- function(raw_pvals_dir, adjusted_pvals_dir){
+  raw_pval_files <- file.path(raw_pvals_dir, list.files(raw_pvals_dir, ".nii.gz"))
+  pval_names <- c("sex", "age", "sex-age")
+  pval_name_list <- name_pvals(raw_pval_files, pval_names)
+  
+  mapply(process_pval_image,
+         file_path = raw_pval_files,
+         pval_name = pval_name_list,
+         MoreArgs = list(
+           mask = settings$mask_path,
+           out_dir = adjusted_pvals_dir))
+}
 ```
 
 ## Run
 ```{r}
-raw_pvals_dir <- file.path(settings$output_dir, "niftis/pvals/raw")
+perform_mc(raw_pvals_dir = file.path(settings$output_dir, "niftis/pvals/raw"),
+           adjusted_pvals_dir = file.path(settings$output_dir, "niftis/pvals/adjusted"))
+perform_mc(raw_pvals_dir = file.path(settings$output_dir, "niftis/pvals/modality_raw"),
+           adjusted_pvals_dir = file.path(settings$output_dir, "niftis/pvals/modality_adjusted"))
 
-raw_pval_files <- file.path(raw_pvals_dir, list.files(raw_pvals_dir, ".nii.gz"))
-pval_names <- c("sex", "age", "sex-age")
-pval_name_list <- name_pvals(raw_pval_files, pval_names)
-
-mapply(process_pval_image,
-       file_path = raw_pval_files,
-       pval_name = pval_name_list,
-       MoreArgs = list(
-         mask = settings$mask_path,
-         out_dir = file.path(settings$output_dir, "niftis/pvals/adjusted")))
+rm(perform_mc, name_pvals, convert_to_ants, process_pval_image, get_file_name)
 ```
 
 # Get p-value descriptive stats
@@ -282,7 +237,7 @@ load_pval_images <- function(pval_directory) {
   check_ants(pval_files)
 }
 
-get_metadata <- function(pval_names, pval_directory) {
+get_metadata <- function(pval_names, pval_directory, is_modality) {
   pval_files <- file.path(pval_directory) %>% list.files(full.names = TRUE)
   
   metadata_df <- pval_names %>%
@@ -290,8 +245,16 @@ get_metadata <- function(pval_names, pval_directory) {
     as.data.frame() %>%
     t() %>%
     as.data.frame()
+  print("Naming")
   rownames(metadata_df) <- 1:nrow(metadata_df)
-  colnames(metadata_df) <- c("scaling", "matrix_type", "coefficient", "mc_correction")
+  if (is_modality) {
+    colnames(metadata_df) <- c("scaling", "coefficient", "mc_correction")
+    metadata_df <- metadata_df %>% cbind(matrix_type = rep("modality", nrow(metadata_df)))
+    metadata_df <- metadata_df %>% select(scaling, matrix_type, coefficient, mc_correction)
+  }
+  else {
+    colnames(metadata_df) <- c("scaling", "matrix_type", "coefficient", "mc_correction")
+  }
   
   metadata_df <- metadata_df %>% mutate(file_paths = pval_files)
   
@@ -305,17 +268,17 @@ get_descriptive_stats <- function(pval_image, gm_mask) {
   data.frame(prop_sig)
 }
 
-process_pval_images <- function(pval_directory, gm_mask, image_format = c("ants", "nifti")) {
-  gm_mask <- check_ants(gm_mask)
+process_pval_images <- function(pval_directory, mask, is_modality) {
+  mask <- check_ants(mask)
   pval_images <- load_pval_images(pval_directory)
   pval_names <- get_file_names(pval_directory)
-  pval_metadata <- get_metadata(pval_names, pval_directory)
+  pval_metadata <- get_metadata(pval_names, pval_directory, is_modality)
   
   pval_metadata_list <- split(pval_metadata, seq(nrow(pval_metadata)))
   
   descriptive_stats <- lapply(pval_images,
                               get_descriptive_stats,
-                              gm_mask)
+                              mask)
   
   descriptive_stats_df <- descriptive_stats %>%
     unlist() %>%
@@ -326,89 +289,24 @@ process_pval_images <- function(pval_directory, gm_mask, image_format = c("ants"
   
   pval_info <- cbind(pval_metadata, descriptive_stats_df)
   
-  if (image_format == "nifti") {
-    pval_images <- lapply(pval_images, ants2oro)
-  }
-  
-  list(pval_info, pval_images)
-}
-
-view_itksnap <- function(pval_info,
-                         pval_mask_filter = "brain",
-                         directory_filter = NULL,
-                         segmentation = NULL,
-                         scaling_filter = NULL,
-                         fwhm_filter = NULL,
-                         coefficient_filter = NULL,
-                         mc_correction_filter = NULL,
-                         pca_mask_filter = NULL,
-                         show_image = TRUE) {
-  if (class(segmentation) == "antsImage") {
-    segmentation <- ants2oro(segmentation)
-  }
-  
-  tmp <- pval_info
-  
-  if (!is.null(directory_filter)) {
-    tmp <- tmp %>% filter(directory == directory_filter)
-  }
-  if (!is.null(pval_mask_filter)) {
-    tmp <- tmp %>% filter(pval_mask == pval_mask_filter)
-  }
-  if (!is.null(scaling_filter)) {
-    tmp <- tmp %>% filter(scaling == scaling_filter)
-  }
-  if (!is.null(fwhm_filter)) {
-    tmp <- tmp %>% filter(fwhm == fwhm_filter)
-  }
-  if (!is.null(coefficient_filter)) {
-    tmp <- tmp %>% filter(coefficient == coefficient_filter)
-  }
-  if (!is.null(mc_correction_filter)) {
-    tmp <- tmp %>% filter(mc_correction == mc_correction_filter)
-  }
-  if (!is.null(pca_mask_filter)) {
-    tmp <- tmp %>% filter(pca_mask == pca_mask_filter)
-  }
-  
-  print(tmp$prop_sig)
-  print(tmp$file_path)
-  
-  
-  file_paths <- tmp$file_paths
-  
-  if (show_image) {
-    if (length(file_paths) == 2) {
-      itksnap(file_paths[1], overlay = file_paths[2], segmentation, verbose = F)
-    } else {
-      for (i in 1:length(file_paths)) {
-        itksnap(file_paths[i], segmentation = segmentation, verbose = F)
-      }
-    }
-  }
-  
-  return(NULL)
+  pval_info
 }
 ```
 
 ## Run
 ```{r}
-pval_dir <- file.path(settings$output_dir, "niftis/pvals")
+coupled_pval_stats <- process_pval_images(file.path(settings$output_dir, "niftis/pvals/adjusted"),
+                                          settings$mask_path, 
+                                          is_modality = FALSE)
 
-pval_image_stats <- process_pval_images(file.path(pval_dir, "adjusted"), settings$mask_path, image_format = "nifti")
-pval_stats_df <- pval_image_stats[[1]]
-view_itksnap(pval_stats_df,
-             pval_mask_filter = NULL,
-             directory_filter = "adjusted_gm",
-             segmentation = gm_mask,
-             scaling_filter = "unscaled",
-             fwhm_filter = "fwhm3",
-             coefficient_filter = NULL,
-             mc_correction_filter = "fdr05",
-             pca_mask_filter = "gm-mask",
-             show_image = TRUE)
+modality_pval_stats <- process_pval_images(file.path(settings$output_dir, "niftis/pvals/modality_adjusted"),
+                                           settings$mask_path,
+                                           is_modality = TRUE)
 
-write_csv(pval_stats_df, file.path(settings$output_dir, "csvs/pval_descriptive_stats.csv"))
+write_csv(rbind(coupled_pval_stats, modality_pval_stats), 
+          file.path(settings$output_dir, "csvs/pval_descriptive_stats.csv"))
+
+rm(get_descriptive_stats, get_file_names, get_metadata, load_pval_images, process_pval_images, coupled_pval_stats, modality_pval_stats)
 ```
 
 # Generate barcharts
@@ -478,17 +376,15 @@ get_prop_sig <- function(file_paths, file_labels, atlas, mask) {
 
 ## Run
 ```{r}
-pvals_dir <- file.path(settings$output_dir, "niftis/pvals")
 pval_metadata <- read_csv(file.path(settings$output_dir, "csvs", "pval_descriptive_stats.csv"))
 yeo7 <- file.path(settings$input_dir, "references/atlases/7yeonetworkPNC.nii.gz") %>% check_ants()
 aal <- file.path(settings$input_dir, "references/atlases/AAL_atlas_PNC.nii.gz") %>% check_ants()
 
-
-# transform aal to yeo7-style mask
+# transform aal to lower resolution
 aal_sym <- floor(aal/10) * 10
 
 all_indices <- unique(aal_sym)
-subcortical_indices <- c(4100, 4200, 7000, 7010, 7020, 7100) # What are the subcortical structures?
+subcortical_indices <- c(4100, 4200, 7000, 7010, 7020, 7100) #select subcortical regions
 
 excluded_indices <- all_indices[!all_indices %in% subcortical_indices]
 
@@ -496,67 +392,86 @@ for(i in 1:length(excluded_indices)) {
   aal_sym[aal_sym == excluded_indices[i]] <- 0
 }
 
-file_labels <- c("global_age", "global_sex", "unscaled_age", "unscaled_sex")
 
 # get file paths
-file_paths <- pval_metadata %>%
-  filter(coefficient == "sex" | coefficient == "age",
+coupled_file_paths <- pval_metadata %>%
+  filter(matrix_type != "modality",
+         coefficient == "sex" | coefficient == "age",
          mc_correction == "fdr05") %>%
   pull(file_paths)
 
-yeo7_df <- get_prop_sig(file_paths, file_labels, yeo7, settings$mask_path)
-yeo7_barplot <- ggplot(yeo7_df, aes(network_ids, proportion)) +
+file_labels <- c("global_age", "global_sex", "unscaled_age", "unscaled_sex")
+
+#Coupled data on Yeo7
+coupled_yeo7 <- get_prop_sig(coupled_file_paths, file_labels, yeo7, settings$mask_path)
+
+coupled_yeo7_barplot <- ggplot(coupled_yeo7, aes(network_ids, proportion)) +
   geom_col() +
   geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
                 position = position_dodge(.9)) +
   facet_wrap(~ map_name) +
-  labs(title = "PCA on Yeo7") +
+  labs(title = "Coupled on Yeo7") +
   scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal Attention", "Ventral Attention", "Limbic", "Frontoparietal", "Default")) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90)); yeo7_barplot
-ggsave(plot = yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+  theme(axis.text.x = element_text(angle = 90)); coupled_yeo7_barplot
 
-aal_sym_df <- get_prop_sig(file_paths, file_labels, aal_sym, settings$mask_path)
-aal_barplot <- ggplot(aal_sym_df, aes(network_ids, proportion)) +
+ggsave(plot = coupled_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+
+#Coupled data on AAL
+coupled_aal <- get_prop_sig(coupled_file_paths, file_labels, aal_sym, settings$mask_path)
+
+coupled_aal_barplot <- ggplot(coupled_aal, aes(network_ids, proportion)) +
   geom_col() +
   geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
                 position = position_dodge(.9)) +
   facet_wrap(~ map_name) +
-  labs(title = "PCA on AAL") +
+  labs(title = "Coupled on AAL") +
   scale_x_discrete(labels = c("Hippocampus", "Amygdala", "Caudate", "Putamen", "Pallidum", "Thalamus")) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90)); aal_barplot
-ggsave(plot = aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
+  theme(axis.text.x = element_text(angle = 90)); coupled_aal_barplot
 
+ggsave(plot = coupled_aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
 
-# # ---------------------------------------------------
-# TODO
-# raw_file_paths <- file.path(dir, "adjusted_gm") %>%
-#   list.files()
-# raw_file_path_select <- raw_file_paths %>%
-#   (function(x) grepl("alff|cbf", x) &
-#      grepl("_sex_|_age_", x) &
-#      grepl("bonferroni", x))
-# raw_file_paths <- file.path(file.path(dir, "adjusted_gm"), raw_file_paths[raw_file_path_select])
-# raw_file_labels <- c("alff_age", "alff_sex", "cbf_age", "cbf_sex")
-# 
-# yeo7_df_raw <- get_prop_sig(raw_file_paths, raw_file_labels, yeo7, gm_mask)
-# ggplot(yeo7_df_raw, aes(network_ids, proportion)) +
-#   geom_col() +
-#   geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
-#                 position = position_dodge(.9)) +
-#   facet_wrap(~ map_name) +
-#   labs(title = "Raw on Yeo7") +
-#   theme_classic()
-# 
-# aal_sym_df_raw <- get_prop_sig(raw_file_paths, raw_file_labels, aal_sym, gm_mask)
-# ggplot(aal_sym_df_raw, aes(network_ids, proportion)) +
-#   geom_col() +
-#   geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
-#                 position = position_dodge(.9)) +
-#   facet_wrap(~ map_name) +
-#   labs(title = "Raw on AAL") +
-#   theme_classic()
+###############################
+
+# Adjusted Modality maps
+modality_file_paths <- pval_metadata %>%
+  filter(matrix_type == "modality",
+         coefficient == "sex" | coefficient == "age",
+         mc_correction == "fdr05") %>%
+  pull(file_paths)
+
+file_labels <- c("global_age", "global_sex", "unscaled_age", "unscaled_sex")
+
+# Modality data on Yeo7
+modality_yeo7 <- get_prop_sig(modality_file_paths, file_labels, yeo7, settings$mask_path) #TODO
+
+modality_yeo7_barplot <- ggplot(modality_yeo7, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "modality on Yeo7") +
+  scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal Attention", "Ventral Attention", "Limbic", "Frontoparietal", "Default")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)); modality_yeo7_barplot
+
+ggsave(plot = modality_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+
+# Modality data on AAL
+modality_aal <- get_prop_sig(modality_file_paths, file_labels, aal_sym, settings$mask_path)
+
+modality_aal_barplot <- ggplot(modality_aal, aes(network_ids, proportion)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = proportion - se, ymax = proportion + se), width = .2,
+                position = position_dodge(.9)) +
+  facet_wrap(~ map_name) +
+  labs(title = "modality on AAL") +
+  scale_x_discrete(labels = c("Hippocampus", "Amygdala", "Caudate", "Putamen", "Pallidum", "Thalamus")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)); modality_aal_barplot
+
+ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
 ```
 
 # Process/transform/project regions to prepare for Spin Test
@@ -654,7 +569,7 @@ preprocess_for_spin_test <- function(file_paths = NULL, atlas_name = c("", "yeo7
       atlas <- check_ants(file.path(settings$input_dir, "references/atlases/7yeonetworkPNC.nii.gz"))
       atlas_output_dir <- "yeo7_regions"
     }
-
+    
     if (atlas_name == "aal") {
       atlas <- check_ants(file.path(settings$input_dir, "references/atlases/AAL_atlas_PNC.nii.gz"))
       atlas_output_dir <- "aal_regions"

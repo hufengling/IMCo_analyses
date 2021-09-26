@@ -172,7 +172,7 @@ analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "idemo"), #TOCH
                        is_modality = TRUE,
                        file_paths = input_filepaths$modality_2 %>% as.list())
 
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "cbf_isla"), #TOCHANGE
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "cbf-isla"), #TOCHANGE
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
