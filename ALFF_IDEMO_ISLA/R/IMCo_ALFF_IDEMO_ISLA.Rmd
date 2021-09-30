@@ -17,6 +17,7 @@ library(freesurfer)
 
 ## Load niftis
 ```{r}
+#TOCHANGE
 idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv"))
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
 idemo_health <- read_csv(here("input/csvs/idemodata/n1601_health_20170421.csv"))
@@ -42,28 +43,31 @@ input_filepaths$subj_num <- as.numeric(input_filepaths$subj_num)
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
-rm(pnc_demographics, common_pts, idemo, idemo_health, idemo_qa, isla_subj)
+rm(pnc_demographics, common_pts, idemo, idemo_health, isla_subj)
 ```
 
 ## Load non-nifti PNC data
 ```{r}
+#TOCHANGE
+idemo_qa <- idemo_qa %>% rename(subj_num = scanid)
 demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")) %>% 
   rename(subj_num = id)
 demographics <- right_join(demographics, input_filepaths, 
                            by = "subj_num") %>% 
-  mutate(across(contains("Exclude"), as.factor),
-         sex = case_when(
-           sex == 1 ~ "Male",
-           sex == 2 ~ "Female",
-           T ~ NA_character_),
-         race2 = case_when(
-           race2 == 1 ~ "White",
-           race2 == 2 ~ "Black",
-           race2 == 3 ~ "Other",
-           T ~ NA_character_),
-         across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
+  left_join(idemo_qa, by = "subj_num")
+mutate(across(contains("Exclude"), as.factor),
+       sex = case_when(
+         sex == 1 ~ "Male",
+         sex == 2 ~ "Female",
+         T ~ NA_character_),
+       race2 = case_when(
+         race2 == 1 ~ "White",
+         race2 == 2 ~ "Black",
+         race2 == 3 ~ "Other",
+         T ~ NA_character_),
+       across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
 predictors <- demographics %>%
-  select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion)
+  select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion, idemoRelMeanRMSMotion)
 
 write_csv(predictors, file.path(here("input/csvs/predictors.csv")))
 rm(demographics)
@@ -71,6 +75,7 @@ rm(demographics)
 
 ## Write settings
 ```{r}
+#TOCHANGE
 output_dir <- here("output") #base directory for all outputs
 input_dir <- here("input") #base directory for all inputs
 nifti_dir <- "~/Documents/IMCo_analyses/input/niftis"
@@ -126,7 +131,8 @@ for(i in 1:nrow(input_filepaths)) {
 }
 
 write_lines(bash_file, file.path(settings$batch_script_dir, "01_commands.sh"))
-#RUNOTHER here("R/batch_scripts/01_commands.sh") on login node
+#TORUNOTHER here("R/batch_scripts/01_commands.sh") on login node
+#TOCOPY
 #Make sure to move 01_perform_imco.R into new directory
 
 rm(bash_file, i, line, out_name, subject_files, bsub_args, Rscript_args)
@@ -134,8 +140,11 @@ rm(bash_file, i, line, out_name, subject_files, bsub_args, Rscript_args)
 
 # Write calculate_pvals bash script
 ```{r}
-#RUNOTHER here("R/batch_scripts/02_calculate_pvals.R) on interactive server
+#TORUNOTHER here("R/batch_scripts/02_calculate_pvals.R) on interactive server
+#TOCOPY
 #Make sure to move 02_calculate_pvals.R into new directory and change #TOCHANGE
+
+#TODO add idemoRelMeanRMSMotion to predictors and then to 02_calculate_pvals
 ```
 
 # Perform multiple comparisons
@@ -441,10 +450,13 @@ modality_file_paths <- pval_metadata %>%
          mc_correction == "fdr05") %>%
   pull(file_paths)
 
-file_labels <- c("global_age", "global_sex", "unscaled_age", "unscaled_sex")
+file_labels <- c("alff_age", "alff_sex", "cbf-isla_age", "cbf-isla_sex", "idemo_age", "idemo_sex") #TOCHANGE
 
 # Modality data on Yeo7
-modality_yeo7 <- get_prop_sig(modality_file_paths, file_labels, yeo7, settings$mask_path) #TODO
+modality_yeo7 <- get_prop_sig(file_paths = modality_file_paths, 
+                              file_labels = file_labels,
+                              atlas = yeo7, 
+                              mask = settings$mask_path) #TODO
 
 modality_yeo7_barplot <- ggplot(modality_yeo7, aes(network_ids, proportion)) +
   geom_col() +
@@ -456,7 +468,7 @@ modality_yeo7_barplot <- ggplot(modality_yeo7, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); modality_yeo7_barplot
 
-ggsave(plot = modality_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+ggsave(plot = modality_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_modality_fdr05.png"), type = "cairo-png")
 
 # Modality data on AAL
 modality_aal <- get_prop_sig(modality_file_paths, file_labels, aal_sym, settings$mask_path)
@@ -471,7 +483,7 @@ modality_aal_barplot <- ggplot(modality_aal, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); modality_aal_barplot
 
-ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
+ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures", "aal_modality_fdr05.png"), type = "cairo-png")
 ```
 
 # Process/transform/project regions to prepare for Spin Test
@@ -603,14 +615,6 @@ preprocess_for_spin_test <- function(file_paths = NULL, atlas_name = c("", "yeo7
     
     return(NULL)
   }
-  # map_type <- c(rep("region", nrow(region_sphere)), rep("pval", nrow(pval_sphere)))
-  # paths_df <- region_sphere %>%
-  #   rbind(pval_sphere) %>%
-  #   mutate(map_type = map_type)
-  # 
-  # write_csv(paths_df, file.path(fs_images_dir, "paths_to_surfaces.csv"))
-  
-  # paths_df
 }
 ```
 
@@ -623,15 +627,26 @@ pval_paths <- read_csv(file.path(settings$output_dir, "csvs/pval_descriptive_sta
   as.list()
 fs_images_dir <- file.path(settings$output_dir, "freesurfer_images")
 
-preprocess_for_spin_test(atlas_name = "yeo7",
+preprocess_for_spin_test(atlas_name = "yeo7", #TODO should I apply grey matter mask?
                          fs_images_dir = fs_images_dir)
 preprocess_for_spin_test(atlas_name = "aal",
                          fs_images_dir = fs_images_dir)
 preprocess_for_spin_test(file_paths = pval_paths,
                          fs_images_dir = fs_images_dir,
                          file_path_output_dir = "pvals/adjusted")
-preprocess_for_spin_test()
+preprocess_for_spin_test(file_paths = list.files(file.path(settings$output_dir, "niftis/descriptive"),
+                                                 full.names = TRUE) %>% as.list(),
+                         fs_images_dir = fs_images_dir,
+                         file_path_output_dir = "descriptive")
 
 ```
 
+# Visualize surface plots
+```{python}
+import os
+from surfer import Brain, project_volume_data
+from mayavi import mlab
+
+mlab.init_notebook(backend='png')
+```
 
