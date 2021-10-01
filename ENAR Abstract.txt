@@ -1,0 +1,5 @@
+Voxel-wise Intermodal Coupling using Principle Components Analysis
+
+Fengling Hu, ..., Russell T. Shinohara
+
+Various MRI and fMRI modalities contain unique information about brain structure and function. When subjects are imaged via multiple modalities, additional information exists in the covariance structure of these modalities. Here, we present a method of describing this covariance structure for two or more modalities at the voxel level. First, we compute weighted covariance matrices from local neighborhoods of each voxel. Then, we calculate the proportion of variance explained by the first eigenvector as a measure of intermodal coupling at that voxel. We use this method to study the coupling structure of three modalities across 760 patients between the ages of 8 and 23. We find this coupling structure changes with respect to age in the somatomotor network as well as in subcortical structures, namely the putamen, pallidum, and thalamus. In contrast, changes in coupling with respect to sex were mostly absent. Intermodal coupling offers a promising perspective for analyzing studies involving multiple modalities.
