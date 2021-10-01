@@ -642,11 +642,8 @@ preprocess_for_spin_test(file_paths = list.files(file.path(settings$output_dir, 
 ```
 
 # Visualize surface plots
-```{python}
-import os
-from surfer import Brain, project_volume_data
-from mayavi import mlab
-
-mlab.init_notebook(backend='png')
+```{}
+#RUNOTHER
+surfplot.ipynb from local. Must download freesurfer_images directory to run.
 ```
 
