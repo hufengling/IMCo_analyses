@@ -424,7 +424,7 @@ coupled_yeo7_barplot <- ggplot(coupled_yeo7, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); coupled_yeo7_barplot
 
-ggsave(plot = coupled_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
+ggsave(plot = coupled_yeo7_barplot, file.path(settings$output_dir, "figures/barplots", "yeo7_pval-prop_fdr05.png"), type = "cairo-png")
 
 #Coupled data on AAL
 coupled_aal <- get_prop_sig(coupled_file_paths, file_labels, aal_sym, settings$mask_path)
@@ -439,7 +439,7 @@ coupled_aal_barplot <- ggplot(coupled_aal, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); coupled_aal_barplot
 
-ggsave(plot = coupled_aal_barplot, file.path(settings$output_dir, "figures", "aal_pval-prop_fdr05.png"), type = "cairo-png")
+ggsave(plot = coupled_aal_barplot, file.path(settings$output_dir, "figures/barplots", "aal_pval-prop_fdr05.png"), type = "cairo-png")
 
 ###############################
 
@@ -468,7 +468,7 @@ modality_yeo7_barplot <- ggplot(modality_yeo7, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); modality_yeo7_barplot
 
-ggsave(plot = modality_yeo7_barplot, file.path(settings$output_dir, "figures", "yeo7_modality_fdr05.png"), type = "cairo-png")
+ggsave(plot = modality_yeo7_barplot, file.path(settings$output_dir, "figures/barplots", "yeo7_modality_fdr05.png"), type = "cairo-png")
 
 # Modality data on AAL
 modality_aal <- get_prop_sig(modality_file_paths, file_labels, aal_sym, settings$mask_path)
@@ -483,7 +483,7 @@ modality_aal_barplot <- ggplot(modality_aal, aes(network_ids, proportion)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90)); modality_aal_barplot
 
-ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures", "aal_modality_fdr05.png"), type = "cairo-png")
+ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures/barplots", "aal_modality_fdr05.png"), type = "cairo-png")
 ```
 
 # Process/transform/project regions to prepare for Spin Test
