@@ -54,8 +54,7 @@ demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")
   rename(subj_num = id)
 demographics <- right_join(demographics, input_filepaths, 
                            by = "subj_num") %>% 
-  left_join(idemo_qa, by = "subj_num")
-mutate(across(contains("Exclude"), as.factor),
+  left_join(idemo_qa, by = "subj_num") %>% mutate(across(contains("Exclude"), as.factor),
        sex = case_when(
          sex == 1 ~ "Male",
          sex == 2 ~ "Female",
@@ -70,7 +69,7 @@ predictors <- demographics %>%
   select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion, idemoRelMeanRMSMotion)
 
 write_csv(predictors, file.path(here("input/csvs/predictors.csv")))
-rm(demographics)
+rm(demographics, idemo_qa)
 ```
 
 ## Write settings
@@ -84,6 +83,7 @@ input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv")
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 predictors_path <- file.path(input_dir, "csvs/predictors.csv")
 settings_path <- file.path(input_dir, "csvs/settings.RData")
+modalities <- c("alff", "cbf-isla", "idemo") #TOCHANGE
 fwhm <- 3
 prop_miss <- 0.9
 
@@ -95,6 +95,7 @@ settings <- list(output_dir = output_dir,
                  mask_path = mask_path,
                  predictors_path = predictors_path,
                  settings_path = settings_path,
+                 modalities = modalities,
                  fwhm = fwhm,
                  prop_miss = prop_miss)
 
@@ -102,7 +103,7 @@ input_filepaths <- read_csv(file.path(settings$input_dir, "csvs/input_filepaths.
 
 save(settings, file = file.path(settings$input_dir, "csvs/settings.RData"))
 
-rm(output_dir, input_dir, nifti_dir, batch_script_dir, input_filepaths_path, mask_path, predictors_path, settings_path, fwhm, prop_miss)
+rm(output_dir, input_dir, nifti_dir, batch_script_dir, input_filepaths_path, mask_path, predictors_path, settings_path, modalities, fwhm, prop_miss)
 ```
 
 # Write IMCo bash script
@@ -448,8 +449,13 @@ modality_file_paths <- pval_metadata %>%
          mc_correction == "fdr05") %>%
   pull(file_paths)
 
-file_labels <- c("alff_age", "alff_sex", "cbf-isla_age", "cbf-isla_sex", "idemo_age", "idemo_sex") #TOCHANGE
-
+file_labels <- c(paste0(settings$modalities[1], "_age"),
+                 paste0(settings$modalities[1], "_sex"),
+                 paste0(settings$modalities[2], "_age"),
+                 paste0(settings$modalities[2], "_sex"),
+                 paste0(settings$modalities[3], "_age"),
+                 paste0(settings$modalities[3], "_sex"))
+                
 # Modality data on Yeo7
 modality_yeo7 <- get_prop_sig(file_paths = modality_file_paths, 
                               file_labels = file_labels,
@@ -482,6 +488,8 @@ modality_aal_barplot <- ggplot(modality_aal, aes(network_ids, proportion)) +
   theme(axis.text.x = element_text(angle = 90)); modality_aal_barplot
 
 ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures/barplots", "aal_modality_fdr05.png"), type = "cairo-png")
+
+rm(aal, aal_sym, yeo7, coupled_aal, coupled_aal_barplot, coupled_yeo7, coupled_yeo7_barplot, modality_aal, modality_aal_barplot, modality_yeo7, modality_yeo7_barplot, pval_metadata, all_indices, coupled_file_paths, excluded_indices, file_labels, i, modality_file_paths, subcortical_indices, get_prop_sig)
 ```
 
 # Process/transform/project regions to prepare for Spin Test

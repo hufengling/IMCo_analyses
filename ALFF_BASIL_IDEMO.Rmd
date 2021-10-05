@@ -1,5 +1,5 @@
 ---
-title: "IMCo_ALFF_ISLA_IDEMO"
+title: "ALFF_IDEMO_BASIL"
 author: "Fengling Hu"
 output: html_document
 ---
@@ -22,28 +22,28 @@ idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv")
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
 idemo_health <- read_csv(here("input/csvs/idemodata/n1601_health_20170421.csv"))
 pnc_demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv"))
-isla_subj <- read_table(here("input/csvs/demographics/isla_subj.txt"), col_names = FALSE)
+basil_subj <- read_table(here("input/csvs/demographics/basil_subj.txt"), col_names = FALSE)
 
 idemo_qa <- idemo_qa %>% filter(idemoExcludeVoxelwise == 0)
 idemo <- idemo %>% filter(idemoBehHappyCorrectCount >= 8)
 idemo_health <- idemo_health %>% filter(ltnExcludev2 == 0)
 pnc_demographics <- pnc_demographics %>% rename(scanid = "id")
-isla_subj <- isla_subj %>% separate(X1, c("scanid", "file_root"), sep = "_")
+basil_subj <- basil_subj %>% separate(X1, c("scanid", "settings", "file_root"), sep = "_")
 
-common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, isla_subj$scanid)) %>%
+common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, basil_subj$scanid)) %>%
   as.data.frame() %>%
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
   mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .),
-         modality_2 = paste0(subj_num, "_predictedGMD1.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-isla", .), 
+         modality_2 = paste0(subj_num, "_pvgmpnc_cbf.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-basil", .), 
          modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo", .))
 
 input_filepaths$subj_num <- as.numeric(input_filepaths$subj_num)
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
-rm(pnc_demographics, common_pts, idemo, idemo_health, isla_subj)
+rm(pnc_demographics, common_pts, idemo, idemo_health, basil_subj)
 ```
 
 ## Load non-nifti PNC data
@@ -54,8 +54,7 @@ demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")
   rename(subj_num = id)
 demographics <- right_join(demographics, input_filepaths, 
                            by = "subj_num") %>% 
-  left_join(idemo_qa, by = "subj_num")
-mutate(across(contains("Exclude"), as.factor),
+  left_join(idemo_qa, by = "subj_num") %>% mutate(across(contains("Exclude"), as.factor),
        sex = case_when(
          sex == 1 ~ "Male",
          sex == 2 ~ "Female",
@@ -70,7 +69,8 @@ predictors <- demographics %>%
   select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion, idemoRelMeanRMSMotion)
 
 write_csv(predictors, file.path(here("input/csvs/predictors.csv")))
-rm(demographics)
+
+rm(demographics, idemo_qa)
 ```
 
 ## Write settings
@@ -84,6 +84,7 @@ input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv")
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 predictors_path <- file.path(input_dir, "csvs/predictors.csv")
 settings_path <- file.path(input_dir, "csvs/settings.RData")
+modalities <- c("alff", "cbf-basil", "idemo")
 fwhm <- 3
 prop_miss <- 0.9
 
@@ -95,6 +96,7 @@ settings <- list(output_dir = output_dir,
                  mask_path = mask_path,
                  predictors_path = predictors_path,
                  settings_path = settings_path,
+                 modalities = modalities,
                  fwhm = fwhm,
                  prop_miss = prop_miss)
 
@@ -108,6 +110,7 @@ rm(output_dir, input_dir, nifti_dir, batch_script_dir, input_filepaths_path, mas
 # Write IMCo bash script
 ```{r}
 bash_file <- rep(0, nrow(input_filepaths))
+
 for(i in 1:nrow(input_filepaths)) {
   line <- input_filepaths[i, ]
   out_name <- line[1]

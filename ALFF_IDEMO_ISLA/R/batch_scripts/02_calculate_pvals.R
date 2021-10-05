@@ -154,25 +154,28 @@ analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/couple
                        predictors = predictors,
                        cores = cores,
                        is_modality = FALSE)
+
 analyze_coupled_images(nifti_dir = file.path(settings$output_dir, "niftis/coupled/unscaled_wcor"),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
                        is_modality = FALSE)
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "alff"), #TOCHANGE
+
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[1]),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
                        is_modality = TRUE,
                        file_paths = input_filepaths$modality_1 %>% as.list())
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "idemo"), #TOCHANGE
+
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[2]),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
                        is_modality = TRUE,
                        file_paths = input_filepaths$modality_2 %>% as.list())
 
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, "cbf-isla"), #TOCHANGE
+analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[3]),
                        mask = settings$mask_path,
                        predictors = predictors,
                        cores = cores,
