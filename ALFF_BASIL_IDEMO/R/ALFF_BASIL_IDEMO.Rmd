@@ -525,8 +525,8 @@ get_names <- function(paths) {
 
 transform_to_MNI <- function(images, paths, MNI_transform_out_dir) {
   MNI <- check_ants(file.path(settings$input_dir, "references/atlases/MNI152_T1_1mm_brain.nii.gz"))
-  transform_list <- c(file.path(settings$input_dir, "references/transformations/PNC-MNI_0Warp.nii.gz"),
-                      file.path(settings$input_dir, "references/transformations/PNC-MNI_1Affine.mat"))
+  transform_list <- c(file.path(settings$input_dir, "transformations/PNC-MNI_0Warp.nii.gz"),
+                      file.path(settings$input_dir, "transformations/PNC-MNI_1Affine.mat"))
   file_names <- get_names(paths)
   
   mapply(function(image, file_name, MNI, transform_list) {
