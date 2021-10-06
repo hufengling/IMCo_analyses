@@ -1,5 +1,5 @@
 ---
-title: "IMCo_ALFF_ISLA_IDEMO"
+title: "ALFF_BASIL_IDEMO"
 author: "Fengling Hu"
 output: html_document
 ---
@@ -22,28 +22,28 @@ idemo_qa <- read_csv(here("input/csvs/idemodata/n1601_idemo_FinalQA_092817.csv")
 idemo <- read_csv(here("input/csvs/idemodata/n1601_idemoBehavior_20151130.csv"))
 idemo_health <- read_csv(here("input/csvs/idemodata/n1601_health_20170421.csv"))
 pnc_demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv"))
-isla_subj <- read_table(here("input/csvs/demographics/isla_subj.txt"), col_names = FALSE)
+basil_subj <- read_table(here("input/csvs/demographics/basil_subj.txt"), col_names = FALSE)
 
 idemo_qa <- idemo_qa %>% filter(idemoExcludeVoxelwise == 0)
 idemo <- idemo %>% filter(idemoBehHappyCorrectCount >= 8)
 idemo_health <- idemo_health %>% filter(ltnExcludev2 == 0)
 pnc_demographics <- pnc_demographics %>% rename(scanid = "id")
-isla_subj <- isla_subj %>% separate(X1, c("scanid", "file_root"), sep = "_")
+basil_subj <- basil_subj %>% separate(X1, c("scanid", "settings", "file_root"), sep = "_")
 
-common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, isla_subj$scanid)) %>%
+common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, basil_subj$scanid)) %>%
   as.data.frame() %>%
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
   mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .),
-         modality_2 = paste0(subj_num, "_predictedGMD1.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-isla", .), 
+         modality_2 = paste0(subj_num, "_pvgmpnc_cbf.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-basil", .), 
          modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo", .))
 
 input_filepaths$subj_num <- as.numeric(input_filepaths$subj_num)
 
 write_csv(input_filepaths, here("input/csvs/input_filepaths.csv"))
 
-rm(pnc_demographics, common_pts, idemo, idemo_health, isla_subj)
+rm(pnc_demographics, common_pts, idemo, idemo_health, basil_subj)
 ```
 
 ## Load non-nifti PNC data
@@ -55,20 +55,21 @@ demographics <- read_csv(here("input/csvs/demographics/binded_demographics.csv")
 demographics <- right_join(demographics, input_filepaths, 
                            by = "subj_num") %>% 
   left_join(idemo_qa, by = "subj_num") %>% mutate(across(contains("Exclude"), as.factor),
-       sex = case_when(
-         sex == 1 ~ "Male",
-         sex == 2 ~ "Female",
-         T ~ NA_character_),
-       race2 = case_when(
-         race2 == 1 ~ "White",
-         race2 == 2 ~ "Black",
-         race2 == 3 ~ "Other",
-         T ~ NA_character_),
-       across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
+                                                  sex = case_when(
+                                                    sex == 1 ~ "Male",
+                                                    sex == 2 ~ "Female",
+                                                    T ~ NA_character_),
+                                                  race2 = case_when(
+                                                    race2 == 1 ~ "White",
+                                                    race2 == 2 ~ "Black",
+                                                    race2 == 3 ~ "Other",
+                                                    T ~ NA_character_),
+                                                  across(c(sex, race, race2, ethnicity, handednessv2), as.factor))
 predictors <- demographics %>%
   select(sex, ageAtScan1, race2, pcaslRelMeanRMSMotion, restRelMeanRMSMotion, idemoRelMeanRMSMotion)
 
 write_csv(predictors, file.path(here("input/csvs/predictors.csv")))
+
 rm(demographics, idemo_qa)
 ```
 
@@ -83,7 +84,7 @@ input_filepaths_path = file.path(input_dir, "csvs/input_filepaths.csv")
 mask_path <- file.path(input_dir, "references/masks/gm10_pcals_rest.nii.gz")
 predictors_path <- file.path(input_dir, "csvs/predictors.csv")
 settings_path <- file.path(input_dir, "csvs/settings.RData")
-modalities <- c("alff", "cbf-isla", "idemo") #TOCHANGE
+modalities <- c("alff", "cbf-basil", "idemo") #TOCHANGE
 fwhm <- 3
 prop_miss <- 0.9
 
@@ -463,7 +464,7 @@ file_labels <- c(paste0(settings$modalities[1], "_age"),
                  paste0(settings$modalities[2], "_sex"),
                  paste0(settings$modalities[3], "_age"),
                  paste0(settings$modalities[3], "_sex"))
-                
+
 # Modality data on Yeo7
 modality_yeo7 <- get_prop_sig(file_paths = modality_file_paths, 
                               file_labels = file_labels,
