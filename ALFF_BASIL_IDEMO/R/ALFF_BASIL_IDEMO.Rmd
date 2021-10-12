@@ -100,11 +100,16 @@ settings <- list(output_dir = output_dir,
                  fwhm = fwhm,
                  prop_miss = prop_miss)
 
-input_filepaths <- read_csv(file.path(settings$input_dir, "csvs/input_filepaths.csv"))
-
 save(settings, file = file.path(settings$input_dir, "csvs/settings.RData"))
 
 rm(output_dir, input_dir, nifti_dir, batch_script_dir, input_filepaths_path, mask_path, predictors_path, settings_path, modalities, fwhm, prop_miss)
+```
+
+## Start from load
+```{r}
+load(here("input/csvs/settings.RData"))
+input_filepaths <- read_csv(settings$input_filepaths_path)
+predictors <- read_csv(settings$predictors_path)
 ```
 
 # Write IMCo bash script
@@ -463,7 +468,7 @@ file_labels <- c(paste0(settings$modalities[1], "_age"),
                  paste0(settings$modalities[2], "_age"),
                  paste0(settings$modalities[2], "_sex"),
                  paste0(settings$modalities[3], "_age"),
-                 paste0(settings$modalities[3], "_sex"))
+                 paste0(settings$modalities[3], "_sex")) #TOCHANGE
 
 # Modality data on Yeo7
 modality_yeo7 <- get_prop_sig(file_paths = modality_file_paths, 
@@ -671,6 +676,7 @@ preprocess_for_spin_test(file_paths = list.files(file.path(settings$output_dir, 
                          fs_images_dir = fs_images_dir,
                          file_path_output_dir = "descriptive")
 
+rm(pval_coupling_paths, pval_descriptive, pval_modality_paths, fs_images_dir, get_names, mri_vol2surf, mri_vol2surf.help, preprocess_for_spin_test, project_to_surface, split_atlas_into_regions, transform_to_MNI)
 ```
 
 # Visualize surface plots
