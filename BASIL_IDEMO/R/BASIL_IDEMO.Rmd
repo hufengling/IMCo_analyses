@@ -682,3 +682,37 @@ rm(pval_coupling_paths, pval_descriptive, pval_modality_paths, fs_images_dir, ge
 #surfplot.ipynb from local. Must download freesurfer_images directory to run.
 ```
 
+```{r}
+fs_images_dir <- list(file.path(settings$output_dir, "../../ALFF_BASIL/output/freesurfer_images/MNI_space/descriptive"),
+                      file.path(settings$output_dir, "freesurfer_images/MNI_space/descriptive"),
+                      file.path(settings$output_dir, "../../ALFF_IDEMO_ISLA/output/freesurfer_images/MNI_space/descriptive"),
+                      file.path(settings$output_dir, "../../ALFF_BASIL_IDEMO/output/freesurfer_images/MNI_space/descriptive"))
+
+
+for(dir in fs_images_dir){
+  print(dir)
+  for(file in list.files(dir)) {
+    print(file)
+    image <- check_ants(file.path(dir, file))
+    n <- length(which(image == 0))
+    print(n)
+  }
+}
+```
+
+```{r}
+coupling_dir <- list(file.path(settings$output_dir, "niftis/coupled/global_wcov"),
+                     file.path(settings$nifti_dir, "alff"),
+                     file.path(settings$nifti_dir, "cbf-basil"),
+                     file.path(settings$nifti_dir, "idemo")
+                     )
+for(dir in coupling_dir){
+  print(dir)
+  for (file in list.files(dir)[1:5]) {
+    image <- check_ants(file.path(dir, file))
+    n <- length(which(image == 0))
+    print(n)
+  }
+}
+```
+

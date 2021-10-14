@@ -176,10 +176,3 @@ analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modali
                        cores = cores,
                        is_modality = TRUE,
                        file_paths = input_filepaths$modality_2 %>% as.list())
-
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[3]),
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = cores,
-                       is_modality = TRUE,
-                       file_paths = input_filepaths$modality_3 %>% as.list())
