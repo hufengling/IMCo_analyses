@@ -118,7 +118,7 @@ bash_file <- rep(0, nrow(input_filepaths))
 for(i in 1:nrow(input_filepaths)) {
   line <- input_filepaths[i, ]
   out_name <- line[1]
-  subject_files <- paste(line[1, 2], line[1, 3], line[1, 4], sep = ",")
+  subject_files <- paste(line[1, 2], line[1, 3], line[1, 4], sep = ",") #TOCHANGE
   
   bsub_args <- paste("bsub",
                      "-q taki_normal",
@@ -685,3 +685,20 @@ rm(pval_coupling_paths, pval_descriptive, pval_modality_paths, fs_images_dir, ge
 #surfplot.ipynb from local. Must download freesurfer_images directory to run.
 ```
 
+# BUGTESTING #TODELETE
+```{r}
+fs_images_dir <- list(file.path(settings$output_dir, "../../ALFF_BASIL/output/freesurfer_images/MNI_space/descriptive"),
+                   file.path(settings$output_dir, "freesurfer_images/MNI_space/descriptive"),
+                   file.path(settings$output_dir, "../../ALFF_IDEMO_ISLA/output/freesurfer_images/MNI_space/descriptive"))
+
+
+for(dir in fs_images_dir){
+print(dir)
+for(file in list.files(dir)) {
+  print(file)
+  image <- check_ants(file.path(dir, file))
+  n <- length(which(image == 0))
+  print(n)
+}
+}
+```
