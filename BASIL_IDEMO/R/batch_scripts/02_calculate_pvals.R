@@ -11,6 +11,9 @@ predictors <- read_csv(settings$predictors_path)
 input_filepaths <- read_csv(settings$input_filepaths_path)
 cores <- 16
 
+print(input_filepaths[1:3, ])
+print(settings$modalities)
+
 # Functions
 load_images <- function(dir, mask, file_paths) {
   if (!is.null(file_paths)) {
