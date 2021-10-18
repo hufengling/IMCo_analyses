@@ -56439,3 +56439,234 @@ fslmaths "/scratch/RtmpOiUVrw/file193d349da93bb.nii.gz"  -s 1.27398272479425 "/s
 NULL
 Warning message:
 In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+Sender: LSF System <jszostek@silver01>
+Subject: Job 11116950: <intermodal_coupling> in cluster <PMACS-SCC> Done
+
+Job <intermodal_coupling> was submitted from host <takim> by user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:15:56 2021
+Job was executed on host(s) <silver01>, in queue <taki_normal>, as user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:20:53 2021
+</home/fengling> was used as the home directory.
+</home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts> was used as the working directory.
+Started at Sun Oct 17 09:20:53 2021
+Terminated at Sun Oct 17 09:30:49 2021
+Results reported at Sun Oct 17 09:30:49 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+Rscript /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts/01_perform_imco.R /home/fengling/Documents/IMCo_analyses/input/niftis/alff/7426_alffStd.nii.gz,~/Documents/IMCo_analyses/input/niftis/cbf-basil-origin/7426_pvgmpnc_cbf.nii.gz,~/Documents/IMCo_analyses/input/niftis/idemo/7426_sigchange_cope1_TaskStd.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/input/references/masks/gm10_pcals_rest.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/output 7426 3 0.9
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   595.11 sec.
+    Max Memory :                                 6708 MB
+    Average Memory :                             4188.86 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               -2708.00 MB
+    Max Swap :                                   3 MB
+    Max Processes :                              3
+    Max Threads :                                92
+    Run time :                                   595 sec.
+    Turnaround time :                            893 sec.
+
+The output (if any) follows:
+
+fslmaths "/scratch/RtmpnBit6D/file191bc16895fba.nii.gz"  -s 1.27398272479425 "/scratch/RtmpnBit6D/file191bc22b376b6";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+fslmaths "/scratch/RtmpnBit6D/file191bc44221e07.nii.gz"  -s 1.27398272479425 "/scratch/RtmpnBit6D/file191bc224961fa";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+Sender: LSF System <jszostek@silver01>
+Subject: Job 11116961: <intermodal_coupling> in cluster <PMACS-SCC> Done
+
+Job <intermodal_coupling> was submitted from host <takim> by user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:15:56 2021
+Job was executed on host(s) <silver01>, in queue <taki_normal>, as user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:20:59 2021
+</home/fengling> was used as the home directory.
+</home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts> was used as the working directory.
+Started at Sun Oct 17 09:20:59 2021
+Terminated at Sun Oct 17 09:30:53 2021
+Results reported at Sun Oct 17 09:30:53 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+Rscript /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts/01_perform_imco.R /home/fengling/Documents/IMCo_analyses/input/niftis/alff/7621_alffStd.nii.gz,~/Documents/IMCo_analyses/input/niftis/cbf-basil-origin/7621_pvgmpnc_cbf.nii.gz,~/Documents/IMCo_analyses/input/niftis/idemo/7621_sigchange_cope1_TaskStd.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/input/references/masks/gm10_pcals_rest.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/output 7621 3 0.9
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   593.21 sec.
+    Max Memory :                                 6780 MB
+    Average Memory :                             4206.43 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               -2780.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                92
+    Run time :                                   593 sec.
+    Turnaround time :                            897 sec.
+
+The output (if any) follows:
+
+fslmaths "/scratch/Rtmp3T823c/file192301051ffc3.nii.gz"  -s 1.27398272479425 "/scratch/Rtmp3T823c/file192301ac9f340";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+fslmaths "/scratch/Rtmp3T823c/file192307e855c49.nii.gz"  -s 1.27398272479425 "/scratch/Rtmp3T823c/file19230e6df851";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+Sender: LSF System <jszostek@silver01>
+Subject: Job 11116938: <intermodal_coupling> in cluster <PMACS-SCC> Done
+
+Job <intermodal_coupling> was submitted from host <takim> by user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:15:56 2021
+Job was executed on host(s) <silver01>, in queue <taki_normal>, as user <fengling> in cluster <PMACS-SCC> at Sun Oct 17 09:20:49 2021
+</home/fengling> was used as the home directory.
+</home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts> was used as the working directory.
+Started at Sun Oct 17 09:20:49 2021
+Terminated at Sun Oct 17 09:30:53 2021
+Results reported at Sun Oct 17 09:30:53 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+Rscript /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/R/batch_scripts/01_perform_imco.R /home/fengling/Documents/IMCo_analyses/input/niftis/alff/7037_alffStd.nii.gz,~/Documents/IMCo_analyses/input/niftis/cbf-basil-origin/7037_pvgmpnc_cbf.nii.gz,~/Documents/IMCo_analyses/input/niftis/idemo/7037_sigchange_cope1_TaskStd.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/input/references/masks/gm10_pcals_rest.nii.gz /home/fengling/Documents/IMCo_analyses/ALFF_cBASIL_IDEMO/output 7037 3 0.9
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   604.32 sec.
+    Max Memory :                                 6676 MB
+    Average Memory :                             4250.84 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               -2676.00 MB
+    Max Swap :                                   1 MB
+    Max Processes :                              3
+    Max Threads :                                92
+    Run time :                                   603 sec.
+    Turnaround time :                            897 sec.
+
+The output (if any) follows:
+
+fslmaths "/scratch/RtmpeyMjUJ/file191ad5ad67803.nii.gz"  -s 1.27398272479425 "/scratch/RtmpeyMjUJ/file191ad51936245";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
+fslmaths "/scratch/RtmpeyMjUJ/file191ad463c8611.nii.gz"  -s 1.27398272479425 "/scratch/RtmpeyMjUJ/file191ad4b4df804";
+
+# Neighborhood diameters in voxels are as follows: 
+# 	 x=7
+# 	 y=7
+# 	 z=7
+
+# Neighborhood is x=7 by y=7 by z=7 voxels
+# Neighborhood diameters in mm are as follows: 
+# 	 x=14
+# 	 y=14
+# 	 z=14
+
+# Neighborhood is x=14 by y=14 by z=14 mm
+# Extracting neighborhood data 
+# Computing weighted covariances 
+# Computing weighted PCs 
+# Extracting IMCo images 
+NULL
+Warning message:
+In tempimg(file, ...) : NAs and NaNs in image file, replacing with zeros
