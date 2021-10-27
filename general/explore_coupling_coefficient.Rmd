@@ -78,20 +78,20 @@ plot_densities(isla_abs_u, list(isla_abs_u_norm %>% log(),
 ```
 
 ```{r}
-isla_g <- load_coupling_vals("ALFF_IDEMO_ISLA", "global_wcov", n = 50, p = 0.01)
+isla_g <- load_coupling_vals("ALFF_IDEMO_ISLA_abs", "global_wcov", n = 50, p = 0.01)
 isla_u <- load_coupling_vals("ALFF_IDEMO_ISLA", "unscaled_wcor", n = 50, p = 0.01)
 
 isla_g_norm <- isla_g * 1.5 - 0.5
 isla_u_norm <- isla_u * 1.5 - 0.5
 
 plot_densities(isla_g, list(isla_g_norm %>% log(),
-                                isla_g_norm ^ 2,
-                                log(isla_g_norm) - log(1 - isla_g_norm),
-                                isla_g_norm ^ .5 - (1 - isla_g_norm) ^ .5))
+                            isla_g_norm ^ 2,
+                            log(isla_g_norm) - log(1 - isla_g_norm),
+                            isla_g_norm ^ .5 - (1 - isla_g_norm) ^ .5))
 plot_densities(isla_u, list(isla_u_norm %>% log(),
-                                isla_u_norm ^ 2,
-                                log(isla_u_norm) - log(1 - isla_u_norm),
-                                isla_u_norm ^ .5 - (1 - isla_u_norm) ^ .5))
+                            isla_u_norm ^ 2,
+                            log(isla_u_norm) - log(1 - isla_u_norm),
+                            isla_u_norm ^ .5 - (1 - isla_u_norm) ^ .5))
 ```
 
 
