@@ -1,7 +1,5 @@
 **/*.nii.gz
 
-!freesurfer/**/*.nii.gz
-
 .DS_Store
 
 .Rproj.user

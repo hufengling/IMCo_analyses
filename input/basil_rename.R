@@ -5,7 +5,7 @@ library(ANTsRCore)
 orig_basil_path <- list.files("niftis/basilPNC", full.name = TRUE)
 orig_basil_name <- list.files("niftis/basilPNC")
 basil_ids <- read_csv("bblid_scanid_sub.csv", col_names = FALSE)
-new_dir <- "niftis/basil/"
+new_dir <- "niftis/cbf-basil/"
 
 for (i in 1:length(orig_basil_path)) {
   basil_image <- check_ants(orig_basil_path[i])
