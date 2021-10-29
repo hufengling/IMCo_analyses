@@ -36,14 +36,14 @@ idemo_qa <- idemo_qa %>% filter(idemoExcludeVoxelwise == 0)
 idemo <- idemo %>% filter(idemoBehHappyCorrectCount >= 8)
 idemo_health <- idemo_health %>% filter(ltnExcludev2 == 0)
 pnc_demographics <- pnc_demographics %>% rename(scanid = "id")
-basil_subj <- basil_subj %>% separate(X1, c("scanid", "settings", "file_root"), sep = "_")
+basil_subj <- basil_subj %>% separate(X1, c("scanid", "settings"), sep = "_")
 
 common_pts <- Reduce(intersect, list(idemo_qa$scanid, idemo$scanid, idemo_health$scanid, pnc_demographics$scanid, basil_subj$scanid)) %>%
   as.data.frame() %>%
   rename(subj_num = ".")
 
 input_filepaths <- common_pts %>% 
-  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .),
+  mutate(modality_1 = paste0(subj_num, "_alffStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/alff", .), #TOCHANGE
          modality_2 = paste0(subj_num, "_basil.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/cbf-basil", .), 
          modality_3 = paste0(subj_num, "_sigchange_cope1_TaskStd.nii.gz") %>% file.path("~/Documents/IMCo_analyses/input/niftis/idemo", .))
 
