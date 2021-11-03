@@ -65,19 +65,37 @@ get_pvals_by_voxel <- function(voxel_vector, predictors) {
     stop("n doesn't match")
   }
 
-  regression <- lm(voxel_vector ~
-                     sex + ageAtScan1 +
-                     race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion, #TOCHANGE
-                   data = predictors) %>%
-    summary()
-  reg_pvals <- regression$coefficients[c(2, 3), 4]
+  if ("idemo" %in% settings$modalities) {
+    regression <- lm(voxel_vector ~
+                       sex + ageAtScan1 +
+                       race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion,
+                     data = predictors) %>%
+      summary()
+    reg_pvals <- regression$coefficients[c(2, 3), 4]
 
-  interaction_regression <- lm(voxel_vector ~
-                                 sex * ageAtScan1 +
-                                 race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion, #TOCHANGE
-                               data = predictors) %>%
-    summary()
-  int_pvals <- interaction_regression$coefficients[8, 4]
+    interaction_regression <- lm(voxel_vector ~
+                                   sex * ageAtScan1 +
+                                   race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion,
+                                 data = predictors) %>%
+      summary()
+    int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
+  }
+
+  else {
+    regression <- lm(voxel_vector ~
+                       sex + ageAtScan1 +
+                       race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                     data = predictors) %>%
+      summary()
+    reg_pvals <- regression$coefficients[c(2, 3), 4]
+
+    interaction_regression <- lm(voxel_vector ~
+                                   sex * ageAtScan1 +
+                                   race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                                 data = predictors) %>%
+      summary()
+    int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
+  }
 
   pvals <- c(reg_pvals, int_pvals)
   return(pvals)
@@ -177,9 +195,11 @@ analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modali
                        is_modality = TRUE,
                        file_paths = input_filepaths$modality_2 %>% as.list())
 
-analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[3]), #TOCHANGE
-                       mask = settings$mask_path,
-                       predictors = predictors,
-                       cores = cores,
-                       is_modality = TRUE,
-                       file_paths = input_filepaths$modality_3 %>% as.list())
+if (length(settings$modalities) == 3) {
+  analyze_coupled_images(nifti_dir = file.path(settings$nifti_dir, settings$modalities[3]),
+                         mask = settings$mask_path,
+                         predictors = predictors,
+                         cores = cores,
+                         is_modality = TRUE,
+                         file_paths = input_filepaths$modality_3 %>% as.list())
+}

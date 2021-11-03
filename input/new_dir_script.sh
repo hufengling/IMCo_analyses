@@ -12,3 +12,7 @@ cp -R $1/input/references/ $2/input/
 cp -R $1/input/csvs/demographics/ $2/input/csvs/
 cp -R $1/input/csvs/idemodata/ $2/input/csvs/
 cp -R $1/R/ $2/
+
+#rename Rmd
+mv $2/R/*.Rmd $2/R/$2.Rmd
+

@@ -77,7 +77,7 @@ get_pvals_by_voxel <- function(voxel_vector, predictors) {
                                  race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion, #TOCHANGE
                                data = predictors) %>%
     summary()
-  int_pvals <- interaction_regression$coefficients[8, 4]
+  int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
 
   pvals <- c(reg_pvals, int_pvals)
   return(pvals)
