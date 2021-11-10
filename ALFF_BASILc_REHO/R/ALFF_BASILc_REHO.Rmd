@@ -576,14 +576,14 @@ transform_to_MNI <- function(images, paths, MNI_transform_out_dir) {
 project_to_surface <- function(image_MNI_paths, out_dir) {
   dir.create(out_dir, showWarnings = FALSE)
   hemi_paths <- lapply(image_MNI_paths, function(image_path) {
-    outfile = get_names(image_path)
+    outfile = get_names(image_path) %>% str_remove(".nii.gz") %>% str_glue(".mgh")
     lh <- mri_vol2surf(mov = image_path,
-                       target_subject = 'fsaverage',
+                       target_subject = 'fsaverage5',
                        opts = "--interp nearest",
                        outfile = file.path(out_dir, outfile),
                        hemi = "lh")
     rh <- mri_vol2surf(mov = image_path,
-                       target_subject = 'fsaverage',
+                       target_subject = 'fsaverage5',
                        opts = "--interp nearest",
                        outfile = file.path(out_dir, outfile),
                        hemi = "rh")
@@ -649,6 +649,7 @@ preprocess_for_spin_test <- function(file_paths = NULL, atlas_name = c("", "yeo7
 ## Run
 ```{r}
 Sys.setenv(FS_LICENSE="/home/fengling/software/freesurfer/license.txt")
+set_fs_subj_dir("/root/software/freesurfer/subjects")
 pval_descriptive <- read_csv(file.path(settings$output_dir, "csvs/pval_descriptive_stats.csv"))
 
 pval_coupling_paths <- pval_descriptive %>% 

@@ -11,6 +11,7 @@ library(extrantsr)
 library(IMCo)
 library(here)
 library(matrixStats)
+library(freesurfer)
 ```
 
 # Distribution of coupling coefficients
@@ -94,4 +95,11 @@ plot_densities(isla_u, list(isla_u_norm %>% log(),
                             isla_u_norm ^ .5 - (1 - isla_u_norm) ^ .5))
 ```
 
+# Exploring freesurfer projections
+```{r}
+fs_image_dir <- here("../input/spin_test/yeo7_regions/")
+yeo7_1_arr <- check_ants(file.path(fs_image_dir, "lh.yeo7_1.nii.gz")) %>% as.array()
+yeo7_1_mgh_arr <- check_ants(file.path(fs_image_dir, "lh.yeo7_1.mgh")) %>% as.array()
+pval_arr <- check_ants(file.path(fs_image_dir, "pvals/adjusted/rh.global_wcov_sex_fdr05.nii.gz")) %>% as.array()
+```
 
