@@ -1,5 +1,5 @@
 **/*.nii.gz
-
+**/*.mat
 .DS_Store
 
 .Rproj.user
