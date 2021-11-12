@@ -1,0 +1,7 @@
+,yeo7_1,yeo7_2,yeo7_3,yeo7_4,yeo7_5,yeo7_6,yeo7_7
+global_wcov_age_fdr05.mgh,0.3745,0.029,0.868,0.124,0.9985,0.91,0.3165
+global_wcov_sex-age_fdr05.mgh,1,1,1,1,1,1,1
+global_wcov_sex_fdr05.mgh,0.207,0.155,0.7055,0.0095,0.998,0.7275,0.898
+unscaled_wcor_age_fdr05.mgh,0.7685,0.291,0.745,0.006,0.899,0.778,0.6685
+unscaled_wcor_sex-age_fdr05.mgh,1,1,1,1,1,1,1
+unscaled_wcor_sex_fdr05.mgh,1,0.268,0.705,0.3675,1,0.536,0.329

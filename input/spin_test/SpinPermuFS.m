@@ -29,11 +29,9 @@ function SpinPermuFS(readleft, readright, permno, filedir, wsname)
 fshome = getenv('FREESURFER_HOME');
 fsmatlab = sprintf('%s/matlab',fshome);
 path(path,fsmatlab);
-path(path, pwd)
-cd(filedir)
 %read the data saved in csv
-datal = MRIread(readleft); datal = datal.vol().'; % .data() part may or may not be needed
-datar = MRIread(readright);datar = datar.vol().'; % .data() part may or may not be needed
+datal = MRIread(filedir + readleft); datal = datal.vol().'; % .data() part may or may not be needed
+datar = MRIread(filedir + readright);datar = datar.vol().'; % .data() part may or may not be needed
 %For an annotation file, please used the following command to load the data
 % [Vl, dataL, ctl] = read_annotation(readleft);
 % [Vr, dataR, ctr] = read_annotation(readright);
@@ -109,6 +107,6 @@ for j=1:permno
     %If annotation file is used, annotation file for each rotation could be
     %saved by write_annotation.m of FreeSurfer
 end
-save(wsname,'bigrotl','bigrotr')
+save(wsname,'bigrotl','bigrotr', 'datal', 'datar')
 %save bigrotl and bigrotr in a workspace file for the null distribution
 %use it in pvalvsNull.m to caclulate pvalue
