@@ -344,25 +344,17 @@ get_prop_sig <- function(file_paths, file_labels, atlas, mask) {
   common_mask <- atlas * mask
   common_mask[common_mask != 0] <- 1
   
-  sig_voxel_images <- lapply(pval_masks, function(pval_mask) {
-    antsSetOrigin(pval_mask, antsGetOrigin(mask))
-    antsSetDirection(pval_mask, antsGetDirection(mask))
-    pval_mask * masked_atlas
-  })
-  nonsig_voxel_images <- lapply(pval_masks, function(pval_mask) {
-    antsSetOrigin(pval_mask, antsGetOrigin(mask))
-    antsSetDirection(pval_mask, antsGetDirection(mask))
-    (-pval_mask + 1) * masked_atlas
-  })
+  sig_voxel_images <- lapply(pval_masks, function(pval_mask) {pval_mask * masked_atlas})
+  nonsig_voxel_images <- lapply(pval_masks, function(pval_mask) {(-pval_mask + 1) * masked_atlas})
   
   for (i in 1:4) {
     sig_sum <- sum(sig_voxel_images[[i]] != 0)
     nonsig_sum <- sum(nonsig_voxel_images[[i]] != 0)
     if (sum(common_mask) != nonsig_sum + sig_sum) {
-      stop()
+      stop("Overall sum of significant and nonsignificant voxels does not match the total number of voxels")
     }
   }
-  
+
   summaries <- mapply(
     function(sig_voxel_image, nonsig_voxel_image, file_label, network_id) {
       sig_summary <- sig_voxel_image[sig_voxel_image != 0] %>%
@@ -385,7 +377,15 @@ get_prop_sig <- function(file_paths, file_labels, atlas, mask) {
         cbind(map_name) %>%
         left_join(sig_summary, by = c("network_ids" = "rowname")) %>%
         left_join(nonsig_summary, by = c("network_ids" = "rowname"))
-      
+      df[is.na(df)] <- 0
+      df <- df %>% mutate(total_voxels = sig_counts + nonsig_counts)
+
+      for (i in 1:nrow(df)) {
+          if (df[i, "total_voxels"] != sum(masked_atlas == df[i, 1])) {
+              stop(paste(masked_atlas == df[i, 1], " Sum of voxels for this region do not match"))
+          }
+      }
+
       return(df)
     },
     sig_voxel_images, nonsig_voxel_images, file_labels,
