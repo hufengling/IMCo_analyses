@@ -73,43 +73,37 @@ get_pvals_by_voxel <- function(voxel_vector, predictors, modality_names) {
     regression <- lm(voxel_vector ~
                        sex + ageAtScan1 +
                        race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion,
-                     data = predictors) %>%
-      summary()
+                     data = predictors) %>% summary()
     reg_pvals <- regression$coefficients[c(2, 3), 4]
 
     interaction_regression <- lm(voxel_vector ~
                                    sex * ageAtScan1 +
                                    race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + idemoRelMeanRMSMotion,
-                                 data = predictors) %>%
-      summary()
+                                 data = predictors) %>% summary()
     int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
   } else if ("antsCt" %in% modality_names | "gmd" %in% modality_names) {
     regression <- lm(voxel_vector ~
                        sex + ageAtScan1 +
                        race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + averageManualRating,
-                     data = predictors) %>%
-      summary()
+                     data = predictors) %>% summary()
     reg_pvals <- regression$coefficients[c(2, 3), 4]
 
     interaction_regression <- lm(voxel_vector ~
                                    sex * ageAtScan1 +
                                    race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion + averageManualRating,
-                                 data = predictors) %>%
-      summary()
+                                 data = predictors) %>% summary()
     int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
   } else {
     regression <- lm(voxel_vector ~
                        sex + ageAtScan1 +
                        race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
-                     data = predictors) %>%
-      summary()
+                     data = predictors) %>% summary()
     reg_pvals <- regression$coefficients[c(2, 3), 4]
 
     interaction_regression <- lm(voxel_vector ~
                                    sex * ageAtScan1 +
                                    race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
-                                 data = predictors) %>%
-      summary()
+                                 data = predictors) %>% summary()
     int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
   }
 
@@ -175,7 +169,8 @@ analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_mo
                                          mc.cores = cores)
   # pvalbyvoxel_list <- lapply(voxel_vector_list,
   #                            get_pvals_by_voxel,
-  #                            predictors = predictors)
+  #                            predictors = predictors,
+  #                            modality_names = settings$modalities)
   pvalbycoef_list <- transpose_list(pvalbyvoxel_list)
 
   cat("Writing pvals!\n")
