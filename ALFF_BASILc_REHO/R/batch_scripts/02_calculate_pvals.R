@@ -94,19 +94,19 @@ get_pvals_by_voxel <- function(voxel_vector, predictors, modality_names) {
       summary()
     int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
   } else {
-    browser()
     regression <- lm(voxel_vector ~ sex + ageAtScan1 +
                        race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
                      data = predictors) %>% summary()
     reg_pvals <- (regression)$coefficients[c(2, 3), 4]
 
-    gam_regression <- gam(voxel_vector ~ sex + s(ageAtScan1, k = 15) +
-                            race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
-                          data = predictors, method = "REML") %>% summary()
-    gam_pvals <- c(gam_regression$p.table[2, 4], gam_regression$s.table[c(4, 1)])
+    interaction_regression <- lm(voxel_vector ~
+                                   sex * ageAtScan1 +
+                                   race2 + pcaslRelMeanRMSMotion + restRelMeanRMSMotion,
+                                 data = predictors) %>% summary()
+    int_pvals <- interaction_regression$coefficients[dim(interaction_regression$coefficients)[1], 4]
   }
 
-  pvals <- c(reg_pvals, gam_pvals)
+  pvals <- c(reg_pvals, int_pvals)
   return(pvals)
 }
 
@@ -160,7 +160,7 @@ analyze_coupled_images <- function(nifti_dir, mask, predictors, cores = 2, is_mo
   descriptive_list <- make_descriptive_images(voxel_vector_list)
 
   cat("Sending out voxel_vectors!\n")
-browser()
+
   pvalbyvoxel_list <- parallel::mclapply(voxel_vector_list,
                                          get_pvals_by_voxel,
                                          predictors = predictors,

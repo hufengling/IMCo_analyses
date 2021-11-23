@@ -510,6 +510,11 @@ modality_aal_barplot <- ggplot(modality_aal, aes(network_ids, proportion)) +
 
 ggsave(plot = modality_aal_barplot, file.path(settings$output_dir, "figures/barplots", "aal_modality_fdr05.png"), type = "cairo-png")
 
+write_csv(modality_aal, file.path(settings$output_dir, "csvs/", "modality_aal.csv"))
+write_csv(modality_yeo7, file.path(settings$output_dir, "csvs/", "modality_yeo7.csv"))
+write_csv(coupled_aal, file.path(settings$output_dir, "csvs/", "coupled_aal.csv"))
+write_csv(coupled_yeo7, file.path(settings$output_dir, "csvs/", "coupled_yeo7.csv"))
+
 rm(aal, aal_sym, yeo7, coupled_aal, coupled_aal_barplot, coupled_yeo7, coupled_yeo7_barplot, modality_aal, modality_aal_barplot, modality_yeo7, modality_yeo7_barplot, pval_metadata, all_indices, coupled_file_paths, excluded_indices, file_labels, i, modality_file_paths, subcortical_indices, get_prop_sig)
 ```
 
