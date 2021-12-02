@@ -1,0 +1,12 @@
+# Methods
+
+## Participants
+  We included 803 participants (340 males) ages 8-23 (mean = 15.6; sd = 3.3) from the Philadelphia Neurodevelopmental Cohort (PNC). Of the 1445 PNC participants who underwent neuroimaging, we initially excluded those meeting any of the following criteria: history of psychoactive medication (n = 165), history of inpatient psychiatric hospitalization (n = 51), or history of medical disorders that could impact brain function (n = 166). From the remaining 1113 participants, we included those who underwent the combination of T1-weighted MRI, arterial spin labeling MRI (ASL), and resting state fMRI (rfMRI) scanning, each of acceptable image quality as determined based on automated and manual screening. This resulted in the final set of 803 participants used for this study.
+  The Institutional Review Boards of the University of Pennsylvania and the Children's Hospital of Pennsylvania approved all study procedures. All study participants gave informed consent; for participants under the age of 18, parents or guardians provided consent and participants provided assent. Additional details of the PNC study have been previously described.
+
+## Image acquisition
+
+## Estimation of intermodal coupling
+
+## Statistical analysis
+

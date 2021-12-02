@@ -1,0 +1,11 @@
+credit-author-statement
+abstract
+introduction
+methods
+participants
+image-acquisition
+estimation-of-intermodal-coupling
+statistical-analysis
+results
+discussion
+supplementary-materials

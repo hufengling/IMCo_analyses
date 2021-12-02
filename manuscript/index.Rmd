@@ -1,0 +1,50 @@
+---
+title: "Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition"
+author:
+  - Fengling Hu:
+      email: fengling.hu@pennmedicine.upenn.edu
+      institute: [dbei]
+      correspondence: true
+  - name: Sarah M. Weinstein
+    institute: dbei
+  - name: Erica B. Baller
+    institute: med
+  - name: Russell T. Shinohara*
+    institute: dbei
+institute:
+  - dbei: Department of Biostatistics, Epidemiology, and Informatics
+  - med: Perelman School of Medicine
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+site: bookdown::bookdown_site
+output:
+  bookdown::word_document2:
+    fig_caption: yes
+    md_extensions: +footnotes
+    reference_docx: /Users/hufengling/Documents/Penn/Shinohara/bookdown_refs/word_style_reference.docx
+    toc: yes
+    pandoc_args:
+      - '--lua-filter=scholarly-metadata.lua'
+      - '--lua-filter=author-info-blocks.lua'
+  bookdown::pdf_document2:
+    base_format: rticles::elsevier_article()
+    includes:
+      before_body: doc_prefix.tex
+      in_header: preamble.tex
+    keep_tex: yes
+    latex_engine: xelatex
+    number_sections: no
+    toc: yes
+    pandoc_args:
+      - '--lua-filter=scholarly-metadata.lua'
+      - '--lua-filter=author-info-blocks.lua'
+bibliography: [book.bib, packages.bib]
+fontsize: 12pt
+link-citations: yes
+csl: https://raw.githubusercontent.com/citation-style-language/styles/master/elsevier-harvard.csl
+---
+
+# CRediT author statement
+Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing - Original Draft, Writing - Review & Editing, Visualization
+
+https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement
+
