@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Methods | Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition</title>
+  <meta name="description" content="Chapter 4 Methods | Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Methods | Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Methods | Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="introduction.html"/>
+<link rel="next" href="results.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> CRediT author statement</a></li>
+<li class="chapter" data-level="2" data-path="abstract.html"><a href="abstract.html"><i class="fa fa-check"></i><b>2</b> Abstract</a></li>
+<li class="chapter" data-level="3" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>3</b> Introduction</a></li>
+<li class="chapter" data-level="4" data-path="methods.html"><a href="methods.html"><i class="fa fa-check"></i><b>4</b> Methods</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="methods.html"><a href="methods.html#participants"><i class="fa fa-check"></i><b>4.1</b> Participants</a></li>
+<li class="chapter" data-level="4.2" data-path="methods.html"><a href="methods.html#image-acquisition"><i class="fa fa-check"></i><b>4.2</b> Image acquisition</a></li>
+<li class="chapter" data-level="4.3" data-path="methods.html"><a href="methods.html#estimation-of-intermodal-coupling"><i class="fa fa-check"></i><b>4.3</b> Estimation of intermodal coupling</a></li>
+<li class="chapter" data-level="4.4" data-path="methods.html"><a href="methods.html#voxel-wise-statistical-analysis"><i class="fa fa-check"></i><b>4.4</b> Voxel-wise statistical analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="methods.html"><a href="methods.html#spin-testing"><i class="fa fa-check"></i><b>4.5</b> Spin Testing</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
+<li class="chapter" data-level="6" data-path="discussion.html"><a href="discussion.html"><i class="fa fa-check"></i><b>6</b> Discussion</a></li>
+<li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
+<li class="chapter" data-level="8" data-path="supplementary-materials.html"><a href="supplementary-materials.html"><i class="fa fa-check"></i><b>8</b> Supplementary Materials</a></li>
+<li class="chapter" data-level="9" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i><b>9</b> Acknowledgements</a></li>
+<li class="chapter" data-level="10" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>10</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="methods" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Methods</h1>
+<div id="participants" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Participants</h2>
+<p>We included 803 participants (340 males) from ages 8-23 (mean = 15.6; sd = 3.3) from the Philadelphia Neurodevelopmental Cohort (PNC)<span class="citation">(<a href="#ref-satterthwaite_neuroimaging_2014" role="doc-biblioref">Satterthwaite et al., 2014</a>)</span>. Of the 1445 PNC participants who underwent neuroimaging, we initially excluded those meeting any of the following criteria: history of psychoactive medication (n = 165), history of inpatient psychiatric hospitalization (n = 51), or history of medical disorders that could impact brain function (n = 166). From the remaining 1113 participants, we included those who underwent the combination of T1-weighted MRI, arterial spin labeling MRI (ASL), and resting state fMRI (rfMRI) scanning, each of acceptable image quality as determined based on automated and manual screening. This resulted in the final set of 803 participants used for this study.
+The Institutional Review Boards of the University of Pennsylvania and the Children’s Hospital of Pennsylvania approved all study procedures. All study participants gave informed consent; for participants under the age of 18, parents or guardians provided consent and participants provided assent. Additional details of the PNC study have been previously described<span class="citation">(<a href="#ref-satterthwaite_neuroimaging_2014" role="doc-biblioref">Satterthwaite et al., 2014</a>)</span>.</p>
+</div>
+<div id="image-acquisition" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Image acquisition</h2>
+</div>
+<div id="estimation-of-intermodal-coupling" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Estimation of intermodal coupling</h2>
+<p>For each subject, we calculated voxel-wise IMCo between CBF, ALFF, and ReHo modalities. First, we applied a grey matter mask to each of the three modalities. Then, within each masked modality, we globally scaled intensities to a mean of 0 and a variance of 1. This scaling is necessary because eigendecomposition is later performed on local covariance matrices, so if modalities are defined on drastically different scales, decomposition outputs will reflect differences in baseline variance between modalities rather than local coupling. Next, for each voxel, we extracted local neighborhoods from each of the three modalities and weighted voxels within these local neighborhoods proportional to a Gaussian kernel over their Euclidean distances from the central voxel - in our study, we used FWHM = 3 which corresponds to 7x7x7 voxel (14x14x14mm) local neighborhoods and a standard deviation of ___mm for the Gaussian kernel. Then, we calculated the 3x3 weighted covariance matrix between the neighborhoods, performed eigendecomposition on them, and extracted the first eigenvalue. Lastly, we scaled the first eigenvalue such that its theoretical minimum was 0 and theoretical maximum was 1 and then performed a logit transformation. This resulted in our voxel-level coupling value, where a large value suggests that the modalities covary strongly near that voxel.</p>
+</div>
+<div id="voxel-wise-statistical-analysis" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Voxel-wise statistical analysis</h2>
+<p>We created descriptive coupling maps by taking the means and variances across all 803 participants at each voxel location in volumetric space. We then projected these mean and variance maps to the FreeSurfer Sphere for visualization of spatial heterogeneity and cortical patterns.
+To investigate biological relevance of PCA-based IMCo, we used linear regression at each voxel to explore whether coupling was associated with age or sex effects. In all linear regressions, we controlled for race and intra-scanner motion for both ASL and rfMRI scans. To control for multiple comparisons in these voxel-level tests, we used a false discovery rate of 0.05 to correct p-values. Then, we created binary masks indicating which p-values remained significant post-correction for both age and sex. For this analysis and following analyses, we performed identical analyses for each of the three modalities individually to explore whether the presence of age and sex effects on modality intensities corresponded to the presence of age and sex effects on coupling values (Supplementary Materials).
+To visualize the extent of voxels where coupling was associated with age and sex, we counted the proportion of voxels with statistically significant age or sex effects in each of the Yeo 7 functional networks as well as in subcortical regions of interest.</p>
+</div>
+<div id="spin-testing" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Spin Testing</h2>
+<p>For Yeo 7 functional networks, we then tested whether the proportion of significant voxels in each functional network was enriched when compared to the null spatial distribution using the spin test <span class="citation">(<a href="#ref-alexander-bloch_testing_2018" role="doc-biblioref">Alexander-Bloch et al., 2018</a>)</span>.</p>
+
+</div>
+</div>
+<h3> References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-alexander-bloch_testing_2018" class="csl-entry">
+Alexander-Bloch, A.F., Shou, H., Liu, S., Satterthwaite, T.D., Glahn, D.C., Shinohara, R.T., Vandekar, S.N., Raznahan, A., 2018. On testing for spatial correspondence between maps of human brain structure and function. NeuroImage 178, 540–551. <a href="https://doi.org/10.1016/j.neuroimage.2018.05.070">https://doi.org/10.1016/j.neuroimage.2018.05.070</a>
+</div>
+<div id="ref-satterthwaite_neuroimaging_2014" class="csl-entry">
+Satterthwaite, T.D., Elliott, M.A., Ruparel, K., Loughead, J., Prabhakaran, K., Calkins, M.E., Hopson, R., Jackson, C., Keefe, J., Riley, M., Mensh, F.D., Sleiman, P., Verma, R., Davatzikos, C., Hakonarson, H., Gur, R.C., Gur, R.E., 2014. Neuroimaging of the <span>Philadelphia</span> <span>Neurodevelopmental</span> <span>Cohort</span>. NeuroImage 86, 544–553. <a href="https://doi.org/10.1016/j.neuroimage.2013.07.064">https://doi.org/10.1016/j.neuroimage.2013.07.064</a>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="introduction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/02-methods.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

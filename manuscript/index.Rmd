@@ -3,17 +3,49 @@ title: "Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using 
 author:
   - Fengling Hu:
       email: fengling.hu@pennmedicine.upenn.edu
-      institute: [dbei]
+      institute: dbei
       correspondence: true
   - name: Sarah M. Weinstein
     institute: dbei
   - name: Erica B. Baller
-    institute: med
+    institute: psych
+  - name: Alessandra M. Valcarcel
+    institute: genentech
+  - name: Azeez Adebimpe
+    institute: psych
+  - name: Armin Raznahan
+    institute: nimh
+  - name: David R. Roalf
+    institute: psych
+  - name: Tim Robert-Fitzgerald
+    institute: dbei
+  - name: Virgilio Gonzenbach
+    institute: dbei
+  - name: Ruben C. Gur
+    institute: [psych, neuro, rad]
+  - name: Raquel E. Gur
+    institute: [psych, neuro, rad]
+  - name: Simon Vandekar
+    institue: vandybiostats
+  - name: John A. Detre
+    institute: neuro
+  - name: Kristin A. Linn
+    institute: dbei
+  - name: Aaron Alexander-Bloch
+    institute: psych
+  - name: Theodore D. Satterthwaite*
+    institute: psych
   - name: Russell T. Shinohara*
     institute: dbei
 institute:
-  - dbei: Department of Biostatistics, Epidemiology, and Informatics
-  - med: Perelman School of Medicine
+  - dbei: Department of Biostatistics, Epidemiology, and Informatics, Perelman School of Medicine, University of Pennsylvania
+  - psych: Department of Psychiatry, Perelman School of Medicine, University of Pennsylvania
+  - rad: Department of Radiology, Perelman School of Medicine, University of Pennsylvania
+  - vetadmin: Philadelphia Veterans Administration Medical Center
+  - neuro: Department of Neurology, Perelman School of Medicine, University of Pennsylvania
+  - nimh: National Institute of Mental Health, Intramural Research Program, National Institute of Health
+  - vandybiostats: Department of Biostatistics, Vanderbilt University
+  - genentech: Currently employed by Genentech
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 site: bookdown::bookdown_site
 output:
@@ -21,10 +53,10 @@ output:
     fig_caption: yes
     md_extensions: +footnotes
     reference_docx: /Users/hufengling/Documents/Penn/Shinohara/bookdown_refs/word_style_reference.docx
-    toc: yes
     pandoc_args:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
+    toc: yes
   bookdown::pdf_document2:
     base_format: rticles::elsevier_article()
     includes:
@@ -33,11 +65,11 @@ output:
     keep_tex: yes
     latex_engine: xelatex
     number_sections: no
-    toc: yes
     pandoc_args:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
-bibliography: [book.bib, packages.bib]
+    toc: yes
+bibliography: [ref.bib, book.bib, packages.bib]
 fontsize: 12pt
 link-citations: yes
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/elsevier-harvard.csl

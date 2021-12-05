@@ -78,7 +78,7 @@
 
 \title{Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition}
 \author{true \and true \and true \and true}
-\date{02 December, 2021}
+\date{03 December, 2021}
 
 \begin{document}
 \maketitle
@@ -94,8 +94,6 @@ Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analys
 
 \url{https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement}
 
-``Fengling Hu\^{}2, Sarah M. Weinstein, Erica B. Baller, Alessandra M. Valcarcel, Azeez Adebimpe, Armin Raznahan, David R. Roalf, Tim Robert-Fitzgerald, Virgilio Gonzenbach, Ruben C. Gur, Raquel E. Gur, Simon Vandekar, John A. Detre, Kristin A. Linn, Aaron Alexander-Bloch, Theodore D. Satterthwaite* , Russell T. Shinohara *''
-
 \hypertarget{abstract}{%
 \section{Abstract}\label{abstract}}
 
@@ -109,15 +107,50 @@ Hello test!
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
 
+\hypertarget{participants}{%
+\subsection{Participants}\label{participants}}
+
+We included 803 participants (340 males) from ages 8-23 (mean = 15.6; sd = 3.3) from the Philadelphia Neurodevelopmental Cohort (PNC)\citep{satterthwaite_neuroimaging_2014}. Of the 1445 PNC participants who underwent neuroimaging, we initially excluded those meeting any of the following criteria: history of psychoactive medication (n = 165), history of inpatient psychiatric hospitalization (n = 51), or history of medical disorders that could impact brain function (n = 166). From the remaining 1113 participants, we included those who underwent the combination of T1-weighted MRI, arterial spin labeling MRI (ASL), and resting state fMRI (rfMRI) scanning, each of acceptable image quality as determined based on automated and manual screening. This resulted in the final set of 803 participants used for this study.
+The Institutional Review Boards of the University of Pennsylvania and the Children's Hospital of Pennsylvania approved all study procedures. All study participants gave informed consent; for participants under the age of 18, parents or guardians provided consent and participants provided assent. Additional details of the PNC study have been previously described\citep{satterthwaite_neuroimaging_2014}.
+
+\hypertarget{image-acquisition}{%
+\subsection{Image acquisition}\label{image-acquisition}}
+
+\hypertarget{estimation-of-intermodal-coupling}{%
+\subsection{Estimation of intermodal coupling}\label{estimation-of-intermodal-coupling}}
+
+For each subject, we calculated voxel-wise IMCo between CBF, ALFF, and ReHo modalities. First, we applied a grey matter mask to each of the three modalities. Then, within each masked modality, we globally scaled intensities to a mean of 0 and a variance of 1. This scaling is necessary because eigendecomposition is later performed on local covariance matrices, so if modalities are defined on drastically different scales, decomposition outputs will reflect differences in baseline variance between modalities rather than local coupling. Next, for each voxel, we extracted local neighborhoods from each of the three modalities and weighted voxels within these local neighborhoods proportional to a Gaussian kernel over their Euclidean distances from the central voxel - in our study, we used FWHM = 3 which corresponds to 7x7x7 voxel (14x14x14mm) local neighborhoods and a standard deviation of \_\_\_mm for the Gaussian kernel. Then, we calculated the 3x3 weighted covariance matrix between the neighborhoods, performed eigendecomposition on them, and extracted the first eigenvalue. Lastly, we scaled the first eigenvalue such that its theoretical minimum was 0 and theoretical maximum was 1 and then performed a logit transformation. This resulted in our voxel-level coupling value, where a large value suggests that the modalities covary strongly near that voxel.
+
+\hypertarget{voxel-wise-statistical-analysis}{%
+\subsection{Voxel-wise statistical analysis}\label{voxel-wise-statistical-analysis}}
+
+We created descriptive coupling maps by taking the means and variances across all 803 participants at each voxel location in volumetric space. We then projected these mean and variance maps to the FreeSurfer Sphere for visualization of spatial heterogeneity and cortical patterns.
+To investigate biological relevance of PCA-based IMCo, we used linear regression at each voxel to explore whether coupling was associated with age or sex effects. In all linear regressions, we controlled for race and intra-scanner motion for both ASL and rfMRI scans. To control for multiple comparisons in these voxel-level tests, we used a false discovery rate of 0.05 to correct p-values. Then, we created binary masks indicating which p-values remained significant post-correction for both age and sex. For this analysis and following analyses, we performed identical analyses for each of the three modalities individually to explore whether the presence of age and sex effects on modality intensities corresponded to the presence of age and sex effects on coupling values (Supplementary Materials).
+To visualize the extent of voxels where coupling was associated with age and sex, we counted the proportion of voxels with statistically significant age or sex effects in each of the Yeo 7 functional networks as well as in subcortical regions of interest.
+
+\hypertarget{spin-testing}{%
+\subsection{Spin Testing}\label{spin-testing}}
+
+For Yeo 7 functional networks, we then tested whether the proportion of significant voxels in each functional network was enriched when compared to the null spatial distribution using the spin test \citep{alexander-bloch_testing_2018}.
+
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
 \hypertarget{supplementary-materials}{%
 \section{Supplementary Materials}\label{supplementary-materials}}
 
-  \bibliography{book.bib,packages.bib}
+\hypertarget{acknowledgements}{%
+\section{Acknowledgements}\label{acknowledgements}}
+
+\hypertarget{references}{%
+\section{References}\label{references}}
+
+  \bibliography{ref.bib,book.bib,packages.bib}
 
 \end{document}
