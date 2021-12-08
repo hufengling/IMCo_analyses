@@ -1,3 +1,11 @@
 # Discussion
 
+## Coupling of blood flow, resting state activation, and connectivity vary with age and sex
+
+## Three modality coupling analysis reveals insights unique to those from pairwise coupling or individual analyses
+
+## Limitations
+
+## Future directions
+
 # Conclusion

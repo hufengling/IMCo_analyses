@@ -1,1 +1,12 @@
 # Results
+
+## Cortical coupling voxel-wise descriptive maps
+  We calculated voxel-wise mean and variance maps of coupling values to characterize spatial patterns in CBF-ALFF-ReHo coupling and visualized these on the FreeSurfer sphere. Throughout the cortical surface, all voxels showed strong coupling, and voxels with stronger coupling also had higher variance between subjects. The average voxel-wise mean coupling value was 0.99 (sd = 0.37; range from 0.27 to 3.30). The average voxel-wise variance was 0.91 (sd = 0.20; range from 0.45 to 2.64).
+  
+  Visually comparison of voxel-wise descriptive maps with the Desikan-Killiany cortical atlas [@desikanAutomatedLabelingSystem2006a] suggests coupling is especially strong in the following regions, bilaterally: superior frontal, paracentral, caudal anterior cingulate, posterior cingulate, isthmus cingulate, pericalcarine, lateral occipital, and insula (TOCITE FIG). Additionally, the parts of the hippocampus and thalamus that can be seen show stronger coupling. These regions also tended to show higher variance,  suggesting these regions may be biologically interesting in the context of CBF-ALFF-ReHo coupling.
+  
+  These voxel-wise descriptive maps of coupling showed unique information to identically-generated descriptive maps of each of the individual modalities (TOCITE SUPPLEMENT).
+  
+## CBF-ALFF-ReHo coupling evolves with age throughout gray matter structures
+
+## CBF-ALFF-ReHo coupling varies between males and females, primarily in subcortical regions

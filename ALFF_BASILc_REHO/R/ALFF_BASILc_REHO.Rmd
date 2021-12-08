@@ -697,3 +697,10 @@ rm(pval_coupling_paths, pval_descriptive, pval_modality_paths, fs_images_dir, ge
 #RUNOTHER
 #surfplot.ipynb from local. Must download freesurfer_images directory to run.
 ```
+
+# Spin test
+```{r}
+#RUNOTHER
+#spin_pvals.m from matlab_interactive.
+```
+
