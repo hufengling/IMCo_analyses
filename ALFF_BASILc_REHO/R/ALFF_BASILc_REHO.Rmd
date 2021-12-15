@@ -13,6 +13,7 @@ library(IMCo)
 library(parallel)
 library(here)
 library(freesurfer)
+library(freesurferformats)
 ```
 
 ## Start from load
@@ -703,4 +704,37 @@ rm(pval_coupling_paths, pval_descriptive, pval_modality_paths, fs_images_dir, ge
 #RUNOTHER
 #spin_pvals.m from matlab_interactive.
 ```
+
+# Descriptive stats
+```{r}
+lh_mean <- read.fs.mgh(here("output/freesurfer_images/surfaces/descriptive/lh.global_wcov_mean.mgh"))
+rh_mean <- read.fs.mgh(here("output/freesurfer_images/surfaces/descriptive/rh.global_wcov_mean.mgh"))
+
+lh_variance <- read.fs.mgh(here("output/freesurfer_images/surfaces/descriptive/lh.global_wcov_variance.mgh"))
+rh_variance <- read.fs.mgh(here("output/freesurfer_images/surfaces/descriptive/rh.global_wcov_variance.mgh"))
+
+lh_mean <- lh_mean[lh_mean != 0]
+lh_variance <- lh_variance[lh_variance != 0]
+rh_mean <- rh_mean[rh_mean != 0]
+rh_variance <- rh_variance[rh_variance != 0]
+
+mean <- c(lh_mean, rh_mean)
+var <- c(lh_variance, rh_variance)
+
+coupling_descriptive_surf <- data.frame(mean_surf = mean, var_surf = var)
+
+mean_vol <- check_ants(here("output/freesurfer_images/MNI_space/descriptive/global_wcov_mean.nii.gz"))
+var_vol <- check_ants(here("output/freesurfer_images/MNI_space/descriptive/global_wcov_variance.nii.gz"))
+
+mean_vol <- mean_vol %>% as.array() %>% as.vector()
+var_vol <- var_vol %>% as.array() %>% as.vector()
+mean_vol <- mean_vol[mean_vol != 0]
+var_vol <- var_vol[var_vol != 0]
+
+coupling_descriptive_vol <- data.frame(mean_vol = mean_vol, var_vol = var_vol)
+
+write.csv(coupling_descriptive_surf, here("output/csvs/coupling_descriptive_surf.csv"))
+write.csv(coupling_descriptive_vol, here("output/csvs/coupling_descriptive_vol.csv"))
+```
+
 

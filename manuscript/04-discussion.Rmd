@@ -1,11 +1,39 @@
 # Discussion
 
-## Coupling of blood flow, resting state activation, and connectivity vary with age and sex
+## PCA-based IMCo allows for the study of covariance structures at single voxel resolution
+  As growing emphasis is placed on the acquisition multi-modal data, new methodologies are necessary to enable these analyses. In 2016, Vandekar et al. introduced a method based on local regression slopes to study IMCo relationships at the single voxel level and showed it could reveal patterns between cortical thickness and sulcal depth that had been undiscovered by studies conducted on regions of interest or across the entire cortex [@vandekarSubjectlevelMeasurementLocal2016]. Since then, this method for studying local coupling has continued to enable discoveries [@ballerDevelopmentalCouplingCerebral2021]. However, despite its strengths, because this method relies on estimating regression slopes between modalities, it is inherently limited to the two-modality setting, cannot take correlation between modalities into account, and is asymmetric.
 
-## Three modality coupling analysis reveals insights unique to those from pairwise coupling or individual analyses
+  In this manuscript, we introduce a generalized approach to estimating IMCo that can be applied to two or more modalities, can be interpreted as a direct summary of local covariance matrices, and is symmetric. This method can be used with any combination of volumetric images to produce single-subject, voxel-resolution coupling images which can then be analyzed using standard techniques. We applied this method to show significant coupling between cerebral blood flow, resting state activations, and local connectivity throughout the brain. We then used voxel-level analyses to characterize how coupling varies in neurodevelopment.
+
+## Coupling of blood flow, resting state activation, and connectivity vary with age and sex
+  We found CBF-ALFF-ReHo coupling varied with age and sex in neurodevelopment in subcortical structures and cortical networks. In cortical networks, associations between coupling and age seemed to be highly enriched in the frontoparietal and default networks, which are networks well known to change through adolescence [TOCITE].
+  
+
+  * Three modality coupling analysis reveals insights unique to those from individual modality analyses
 
 ## Limitations
-
+  PCA-based IMCo is designed to summarize a complex local covariance structure as one value to allow for easy analysis and data reduction. While this property is a main strength of the method, it leads to outputs that can be challenging to interpret, and these outputs cannot fully characterize the intricacies of coupling. This is especially true in settings with more than two modalities, as the covariance structure becomes even more complex and biological interpretation of coupling between many modalities can be non-intuitive.
+  
+  The symmetric nature of PCA-based IMCo is conducive to more consistent interpretation when compared to slope-based IMCo. However, while slope is an intuitive measure that can be interpreted as capturing the effect size of a relationship, the generalizable nature of our PCA-based coupling value makes it challenging to interpret biologically. Instead, it is most accurately interpreted in statistical terms - as a measure of the proportion of variance explained by the first eigenvector, or as a measure of how well the local covariance structure can be summarized by the first eigenvector. Here, we chose to interpret neighborhoods whose covariance structures could be well-summarized as ones that are strongly coupled.
+  
+  This interpretation of PCA-based coupling highlights that in two-modality settings it cannot describe biological directionality of coupling - whether local increases in one modality lead, on average, to increases or decreases in the other modality. In more than two modalities, pairwise directionality is not described. Instead, it can only describe the strength of the coupling relationship. However, this can also be seen as an improvement over slope-based IMCo - with PCA-based IMCo, larger values uniformly correspond to stronger coupling, while with slope-based IMCo, more positive or more negative values both correspond to stronger coupling.
+  
+  Finally, though PCA-based coupling does not require specification of an arbitrary reference modality to calculate coupling values, it is still subject to other run-time choices, such as FWHM value or application of masks.
+  
 ## Future directions
 
+  * Comments from John Detre: More importantly, although I can’t claim to completely understand the methods, I suspect there are numerous impactful applications.  For one thing, I have been skeptical of methods for partial volume correction of ASL CBF data because all of the correction methods are based on assumptions that may be incorrect and produce hypothetical CBF maps of voxels comprised of 100% gray matter that don’t actually exist. Examining structure-function relationships using uncorrected CBF and cortical thickness as inputs might be an alternative approach to PVC. Intermodal comparisons are also of high interest in neurodegenerative disorders that are studied intensively at Penn using multimodal MRI and PET scanning. In particular, relationships between structure, function, and amyloid or tau deposition using this approach could be worth pursuing in the context of the popular A-T-N (amyloid-tau-neurodegeneration) model for biological characterization of Alzheimer’s disease.
+
+  * Data augmentation for prediction
+  * Data reduction
+  * Extension to other spatial data (spatial RNA-seq?)
+
+
 # Conclusion
+  PCA-based IMCo offers a generalized approach for describing coupling between two modalities and a novel perspective for summarizing the overall covariance structure between more than two modalities. Here, we applied this method to the analysis of coupling between cerebral blood flow, resting state activations, and local connectivity maps. This analysis revealed patterns in neurodevelopment with respect to age and sex that were unique to those present in any individual modality. As multi-modal data becomes more common, we hope that PCA-based IMCo will serve as a tool for capturing complex intermodal relationships and allow for additional descriptive analyses, improved prediction efforts, and novel methodological advances, among others.
+  
+# Acknowledgements
+
+# References
+
+<div id="refs"></div>

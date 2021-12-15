@@ -10,8 +10,14 @@ voxel-wise-statistical-analysis
 spin-testing
 code-availibility
 results
+cortical-coupling-voxel-wise-descriptive-maps
+cbf-alff-reho-coupling-evolves-with-age-throughout-gray-matter-structures
+cbf-alff-reho-coupling-varies-between-males-and-females-primarily-in-subcortical-regions
 discussion
+pca-based-imco-allows-for-the-study-of-covariance-structures-at-single-voxel-resolution
+coupling-of-blood-flow-resting-state-activation-and-connectivity-vary-with-age-and-sex
+limitations
+future-directions
 conclusion
-supplementary-materials
 acknowledgements
 references

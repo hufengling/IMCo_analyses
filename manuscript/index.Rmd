@@ -10,7 +10,7 @@ author:
   - name: Erica B. Baller
     institute: psych
   - name: Alessandra M. Valcarcel
-    institute: genentech
+    institute: [dbei, genentech]
   - name: Azeez Adebimpe
     institute: psych
   - name: Armin Raznahan
@@ -22,11 +22,11 @@ author:
   - name: Virgilio Gonzenbach
     institute: dbei
   - name: Ruben C. Gur
-    institute: [psych, neuro, rad]
+    institute: [psych, rad, neuro]
   - name: Raquel E. Gur
-    institute: [psych, neuro, rad]
+    institute: [psych, rad, neuro]
   - name: Simon Vandekar
-    institue: vandybiostats
+    institute: vandybiostats
   - name: John A. Detre
     institute: neuro
   - name: Kristin A. Linn
@@ -45,7 +45,7 @@ institute:
   - neuro: Department of Neurology, Perelman School of Medicine, University of Pennsylvania
   - nimh: National Institute of Mental Health, Intramural Research Program, National Institute of Health
   - vandybiostats: Department of Biostatistics, Vanderbilt University
-  - genentech: Currently employed by Genentech
+  - genentech: Genentech Inc.
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 site: bookdown::bookdown_site
 output:
@@ -56,7 +56,7 @@ output:
     pandoc_args:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
-    toc: yes
+    toc: no
   bookdown::pdf_document2:
     base_format: rticles::elsevier_article()
     includes:
@@ -68,7 +68,7 @@ output:
     pandoc_args:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
-    toc: yes
+    toc: no
 bibliography: [ref.bib, book.bib, packages.bib]
 fontsize: 12pt
 link-citations: yes
@@ -77,6 +77,8 @@ csl: https://raw.githubusercontent.com/citation-style-language/styles/master/els
 
 # CRediT author statement
 Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing - Original Draft, Writing - Review & Editing, Visualization
+
+TODO
 
 https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement
 
