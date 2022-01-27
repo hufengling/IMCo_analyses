@@ -1,3 +1,10 @@
+fig:workflow
+fig:desc
+fig:barplot
+fig:binary
+fig:cbf
+fig:alff
+fig:reho
 credit-author-statement
 abstract
 introduction
@@ -14,10 +21,10 @@ cortical-coupling-voxel-wise-descriptive-maps
 cbf-alff-reho-coupling-evolves-with-age-throughout-gray-matter-structures
 cbf-alff-reho-coupling-varies-between-males-and-females-primarily-in-subcortical-regions
 discussion
-pca-based-imco-allows-for-the-study-of-covariance-structures-at-single-voxel-resolution
 coupling-of-blood-flow-resting-state-activation-and-connectivity-vary-with-age-and-sex
 limitations
 future-directions
 conclusion
 acknowledgements
 references
+supplementary-materials

@@ -3,24 +3,24 @@ title: "Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using 
 author:
   - Fengling Hu:
       email: fengling.hu@pennmedicine.upenn.edu
-      institute: dbei
+      institute: pennsive
       correspondence: true
   - name: Sarah M. Weinstein
-    institute: dbei
+    institute: pennsive
   - name: Erica B. Baller
-    institute: psych
+    institute: pennlinc
   - name: Alessandra M. Valcarcel
-    institute: [dbei, genentech]
+    institute: pennsive
   - name: Azeez Adebimpe
-    institute: psych
+    institute: pennlinc
   - name: Armin Raznahan
     institute: nimh
   - name: David R. Roalf
     institute: psych
   - name: Tim Robert-Fitzgerald
-    institute: dbei
+    institute: pennsive
   - name: Virgilio Gonzenbach
-    institute: dbei
+    institute: pennsive
   - name: Ruben C. Gur
     institute: [psych, rad, neuro]
   - name: Raquel E. Gur
@@ -30,22 +30,24 @@ author:
   - name: John A. Detre
     institute: neuro
   - name: Kristin A. Linn
-    institute: dbei
+    institute: pennsive
   - name: Aaron Alexander-Bloch
     institute: psych
   - name: Theodore D. Satterthwaite*
-    institute: psych
+    institute: pennlinc
   - name: Russell T. Shinohara*
-    institute: dbei
+    institute: [pennsive, cbica]
 institute:
-  - dbei: Department of Biostatistics, Epidemiology, and Informatics, Perelman School of Medicine, University of Pennsylvania
+  - pennsive: Penn Statistics in Imaging and Visualization Endeavor (PennSIVE), Department of Biostatistics, Epidemiology, and Informatics, Perelman School of Medicine, University of Pennsylvania
+  - cbica: Center for Biomedical Image Computing and Analytics (CBICA), Perelman School of Medicine
   - psych: Department of Psychiatry, Perelman School of Medicine, University of Pennsylvania
+  - pennlinc: The Penn Lifespan Informatics and Neuroimaging Center, Department of Psychiatry, Perelman School of Medicine, University of Pennsylvania
   - rad: Department of Radiology, Perelman School of Medicine, University of Pennsylvania
   - vetadmin: Philadelphia Veterans Administration Medical Center
   - neuro: Department of Neurology, Perelman School of Medicine, University of Pennsylvania
   - nimh: National Institute of Mental Health, Intramural Research Program, National Institute of Health
   - vandybiostats: Department of Biostatistics, Vanderbilt University
-  - genentech: Genentech Inc.
+#  - genentech: Genentech Inc.
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 site: bookdown::bookdown_site
 output:
@@ -69,16 +71,21 @@ output:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
     toc: no
-bibliography: [ref.bib, book.bib, packages.bib]
+bibliography: [ref.bib, references.bib, packages.bib]
 fontsize: 12pt
 link-citations: yes
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/elsevier-harvard.csl
+nocite: |
+  @R-base, @stringr, @R-bookdown, @R-knitr, @R-rmarkdown, @bookdown2016, @tidyverse, @extrantsr, @antsr, @antsrcore, @here, @fischl2012freesurfer, @fsformats, @jenkinson2012fsl, @muschelli2015fslr, @rlist, @neurobase, @py06nimg
 ---
 
 # CRediT author statement
-Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing - Original Draft, Writing - Review & Editing, Visualization
+Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing -- Original Draft, Writing - Review & Editing, Visualization
 
 TODO
 
 https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement
 
+```{r include = FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3.5, echo = FALSE, warning = FALSE, message = FALSE) 
+```

@@ -1,22 +1,30 @@
 # Results
 
-## Cortical coupling voxel-wise descriptive maps
-  We calculated voxel-wise mean and variance maps of coupling values to characterize spatial patterns in CBF-ALFF-ReHo coupling and visualized these on the FreeSurfer sphere. Throughout the cortical surface, all voxels showed strong coupling, and voxels with stronger coupling also had higher variance between subjects. The average voxel-wise mean coupling value was 0.99 (sd = 0.37; range from 0.27 to 3.30). The average voxel-wise variance was 0.91 (sd = 0.20; range from 0.45 to 2.64).
+## Coupling varies across the cortical surface and is increased in specific regions, bilaterally 
+  We calculated voxel-wise mean and variance maps of coupling values to characterize spatial patterns in CBF-ALFF-ReHo coupling and visualized these on the FreeSurfer sphere. Throughout the cortical surface, all voxels showed strong coupling, and voxels with stronger average coupling also had higher variance between subjects [TODO: get correlation between mean and variance]. The average voxel-wise mean coupling value was 0.99 (sd = 0.37; range from 0.27 to 3.30). The average voxel-wise variance was 0.91 (sd = 0.20; range from 0.45 to 2.64).
   
-  Visual comparison of voxel-wise descriptive maps with the Desikan-Killiany cortical atlas [@desikanAutomatedLabelingSystem2006a] suggests coupling is especially strong in the following regions, bilaterally: superior frontal, paracentral, caudal anterior cingulate, posterior cingulate, isthmus cingulate, pericalcarine, lateral occipital, and insula (TOCITE FIG). Additionally, the parts of the hippocampus and thalamus that can be seen show stronger coupling. These regions also tended to show higher variance,  suggesting these regions may be biologically interesting in the context of CBF-ALFF-ReHo coupling.
+  Visual comparison of voxel-wise descriptive maps with the Desikan-Killiany cortical atlas [@desikanAutomatedLabelingSystem2006a] suggested that coupling is especially strong in the following regions, bilaterally: superior frontal gyrus, paracentral gyrus, caudal anterior cingulate, posterior cingulate, isthmus cingulate, pericalcarine, lateral occipital, and insula (Figure \@ref(fig:desc)). These regions also tended to show higher variance. Comparing to the Yeo 7 functional networks, areas of strong coupling are observed primarily in the default and frontoparietal networks \@ref(fig:barplot).
 
-  Comparing to the Yeo 7 functional networks, areas of strong coupling are observed primarily in the default and frontoparietal networks. Small portions of the visual network as well as other networks also show strong coupling, though those patterns were less apparent.
+  These voxel-wise descriptive maps of coupling showed unique information to descriptive maps of each of the individual modalities (Supplementary Figures \@ref(fig:cbf), \@ref(fig:alff), and \@ref(fig:reho)).
   
-  These voxel-wise descriptive maps of coupling showed unique information to identically-generated descriptive maps of each of the individual modalities (TOCITE SUPPLEMENT).
+```{r desc, fig.cap = "A) Voxel-wise means across subjects of cortical coupling coefficients between CBF, ALFF, and ReHo. Larger values indicate stronger coupling. B) Voxel-wise variances across subjects of cortical coupling coefficients between CBF, ALFF, and ReHo."}
+knitr::include_graphics("figures/coupling_desc-01.png")
+```
   
 ## CBF-ALFF-ReHo coupling evolves with age throughout gray matter structures
-  Linear associations between strength of coupling and age were present in subcortical structures and cortical networks (TOCITE FIG; corrected p < 0.05). In subcortical structures, age-related changes in CBF-ALFF-ReHo coupling occurred primarily in the caudate and pallidum, though such changes were also observed in sizable proportions of the hippocampus, putamen, and thalamus.
+  Linear associations between strength of coupling and age were present in subcortical structures and cortical networks (Figure \@ref(fig:barplot); corrected p < 0.05). In subcortical structures, age-related changes in CBF-ALFF-ReHo coupling occurred primarily in the caudate and pallidum, though such changes were also observed in sizable proportions of the hippocampus, putamen, and thalamus.
   
-  In cortical networks, coupling and age associations were rare in all networks except the frontoparietal and default networks (TOCITE FIG BINARY). These two networks were also the networks in which the average strength of coupling across subjects was highest (TOCITE FIG).
-  
-  Spin testing between functional networks and age-related changes in coupling showed enrichment of coupling and age associations in the frontoparietal (p = 0.0125) and default networks (p = 0.039).
+```{r barplot, fig.cap = "Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant age and sex effects when race and in-scanner motion were corrected included as covariates (FDR corrected p < 0.05). Spin test was performed for Yeo 7 networks and significant p-values are reported (p < 0.05)."}
+knitr::include_graphics("figures/joint_barplots_norace.png")
+# [TODO: Should I change to Jaccard? Or change spin test to proportions?]
+# TODO: change range to 0.20
+```
 
-## CBF-ALFF-ReHo coupling varies between males and females, primarily in subcortical regions
-  Associations between CBF-ALFF-ReHo coupling and sex were present primarily in the hippocampus and thalamus (TOCITE FIG; corrected p < 0.05). Low proportions of other subcortical structures as well as all functional networks also showed coupling and sex associations (TOCITE FIG BINARY).
+  In cortical networks, coupling and age associations were rare in all networks except the frontoparietal and default networks (Figure \@ref(fig:binary)). These two networks were also the networks in which the average strength of coupling across subjects appeared to be highest (Figure \@ref(fig:desc)). Spin testing between functional networks and age-related changes in coupling showed enrichment of coupling and age associations in the frontoparietal (p = 0.013) and default networks (p = 0.039).
   
-  Spin testing between functional networks and sex-related changes in coupling revealed enrichment of coupling and sex associations in the frontoparietal network (p = 0.0115), despite the small proportion of the frontoparietal network that exhibited coupling associations with sex. Since spin testing is a spatial permutation test which uses the sex-coupling association thresholded p-value map, this is likely due to a combination of overall rare such associations in the cortex and the particular spatial distribution of these associations within the frontoparietal network.
+```{r binary, fig.cap = "A) Thresholded maps of voxels with significant coupling associations with age after FDR correction at 0.05. B) Thresholded maps of voxels with significant coupling associations with sex after FDR correction at 0.05."}
+knitr::include_graphics("figures/coupling_binary-01.png")
+```
+  
+## CBF-ALFF-ReHo coupling varies between males and females, primarily in subcortical regions
+  Associations between CBF-ALFF-ReHo coupling and sex were present primarily in the hippocampus and thalamus (Figure \@ref(fig:barplot); corrected p < 0.05). Sex differences in coupling were rare in other subcortical structures and all functional networks -- only 1% to 3% of voxels in these regions showed coupling and sex associations (Figure \@ref(fig:binary)). Spin testing between functional networks and sex-related changes in coupling revealed enrichment of coupling and sex associations in the frontoparietal network (p = 0.012), despite the small proportion of the frontoparietal network that exhibited coupling associations with sex.
