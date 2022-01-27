@@ -1,0 +1,338 @@
+---
+title: "simulation_interpretation-guide"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggpubr)
+library(ggthemes)
+library(ggprism)
+library(ggforce)
+library(pIMCo)
+library(ANTsR)
+library(extrantsr)
+library(neurobase)
+```
+
+## Start from load
+```{r}
+load(here("input/csvs/settings.RData"))
+input_filepaths <- read_csv(settings$input_filepaths_path)
+predictors <- read_csv(settings$predictors_path)
+coupling_age <- check_ants(here("output/niftis/pvals/adjusted/global_wcov_age_fdr05.nii.gz"))
+default_network <- check_ants(here("output/freesurfer_images/PNC_space/yeo7_regions/yeo7_7.nii.gz"))
+coupling_files <- list.files(here("output/niftis/coupled/global_wcov"), full.names = TRUE)
+input_filepaths <- cbind(input_filepaths, coupling_files)
+```
+
+# Get intensities at significant voxels
+```{r}
+mask <- coupling_age * default_network
+mod_vals <- array(rep(NaN, nrow(input_filepaths) * sum(mask) * (ncol(input_filepaths) - 1)), 
+                  c(nrow(input_filepaths), sum(mask), ncol(input_filepaths) - 1))
+for (i in 1:nrow(input_filepaths)) {
+  tmp_alff <- check_ants(input_filepaths$modality_1[i]) %>% zscore_img() %>% oro2ants()
+  tmp_cbf <- check_ants(input_filepaths$modality_2[i]) %>% zscore_img() %>% oro2ants()
+  tmp_reho <- check_ants(input_filepaths$modality_3[i]) %>% zscore_img() %>% oro2ants()
+  tmp_coupling <- check_ants(input_filepaths$coupling_files[i])
+  
+  alff_arr <- tmp_alff[mask == 1]
+  cbf_arr <- tmp_cbf[mask == 1]
+  reho_arr <- tmp_reho[mask == 1]
+  coupling_arr <- tmp_coupling[mask == 1]
+  
+  joined <- cbind(alff_arr, cbf_arr, reho_arr, coupling_arr)
+  mod_vals[i, , ] <- joined
+  print(paste("Done for subject", i))
+}
+```
+
+# Get intensities for one voxel
+```{r}
+make_modality_plots <- function(voxel_num, mod_vals, predictors, return_mod = FALSE, return_df = FALSE) {
+  voxel_vals <- mod_vals[, voxel_num, ]
+  voxel_vals_df <- voxel_vals %>% 
+    as.data.frame() %>% 
+    cbind(age = predictors$ageAtScan1)
+  if (return_mod) {
+    mod <- lm(V4 ~ age, data = voxel_vals_df)$coefficients[2]
+    return(mod)
+  }
+  if (return_df) {
+    return(voxel_vals_df)
+  }
+  
+  alff_plot <- ggplot(voxel_vals_df, aes(age, V1)) + geom_point() +
+    geom_smooth(method='lm', formula= y~x)
+  cbf_plot <- ggplot(voxel_vals_df, aes(age, V2)) + geom_point() +
+    geom_smooth(method='lm', formula= y~x)
+  reho_plot <- ggplot(voxel_vals_df, aes(age, V3)) + geom_point() +
+    geom_smooth(method='lm', formula= y~x)
+  coupling_plot <- ggplot(voxel_vals_df, aes(age, V4)) + 
+    geom_point() + 
+    geom_smooth(method='lm', formula= y~x)
+  plot_list <- list(alff_plot, cbf_plot, reho_plot, coupling_plot)
+  return(plot_list)
+}
+
+coefs <- sapply(1:2996, function(x) make_modality_plots(x, mod_vals, predictors, TRUE))
+
+plot_list <- make_modality_plots(voxel_num = 585, mod_vals, predictors); plot_list[[4]] # corresponds to voxel [65, 100, 40]
+voxel_vals_df <- make_modality_plots(voxel_num = 585, mod_vals, predictors, return_df = TRUE) %>% 
+  mutate(age = age / 12) # Voxel corresponds to part of grey matter in left frontal cortex in default network
+```
+
+# Modality by age
+```{r}
+title_size <- 25
+axis_size <- 15
+xy_title_size <- 23
+x_lim <- c(8, 23)
+
+alff_plot <- ggplot(voxel_vals_df, aes(age, V1)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "grey22", size = 3) +
+  labs(x = "Age", y = "ALFF") +
+  scale_x_continuous(limits = x_lim) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.1 * max(voxel_vals_df$V1))) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); alff_plot
+
+cbf_plot <- ggplot(voxel_vals_df, aes(age, V2)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "grey22", size = 3) +
+  labs(x = "Age", y = "CBF") +
+  scale_x_continuous(limits = x_lim) +
+  scale_y_continuous(expand = c(0, 0), limits = c(1.3 * min(voxel_vals_df$V2), 1.1 * max(voxel_vals_df$V2))) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); cbf_plot
+
+reho_plot <- ggplot(voxel_vals_df, aes(age, V3)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "grey22", size = 3) +
+  labs(x = "Age", y = "ReHo") +
+  scale_x_continuous(limits = x_lim) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.1 * max(voxel_vals_df$V3))) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); reho_plot
+
+coupling_plot <- ggplot(voxel_vals_df, aes(age, V4)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "grey22", size = 3) +
+  labs(x = "Age", y = "Coupling") +
+  scale_x_continuous(limits = x_lim) +
+  scale_y_continuous(breaks = seq(-2, 4, 1)) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); coupling_plot
+
+mod_by_age <- ggarrange(alff_plot, cbf_plot, reho_plot, coupling_plot, nrow = 2, ncol = 2); mod_by_age
+ggsave(filename = here("output/figures/simulation/modality_by_age.png"), plot = mod_by_age, type = "cairo-png", width = 15.083, height = 10.906, dpi = 300)
+```
+
+# Pairwise modalities
+```{r}
+alff_cbf <- ggplot(voxel_vals_df, aes(V2, V1)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "black") +
+  labs(x = "CBF", y = "ALFF") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); alff_cbf
+
+reho_cbf <- ggplot(voxel_vals_df, aes(V2, V3)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "black") +
+  labs(x = "CBF", y = "ReHo") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); reho_cbf
+
+reho_alff <- ggplot(voxel_vals_df, aes(V3, V1)) + 
+  geom_point(colour = "grey69") + 
+  geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "black") +
+  labs(x = "ReHo", y = "ALFF") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); reho_alff
+
+coupling_hist <- ggplot(voxel_vals_df, aes(V4)) +
+  geom_histogram(fill = "grey69", colour = "grey40", bins = 15) +
+  labs(x = "Coupling") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); coupling_hist
+
+ggarrange(alff_cbf, reho_cbf, reho_alff, coupling_hist, nrow = 2, ncol = 2)
+```
+
+# "Simulation"
+```{r}
+set.seed(2022)
+random_subject <- sample(1:803, 1) # subject 4156
+alff_ants <- check_ants(here("../input/niftis/alff/4156_alffStd.nii.gz")) %>% 
+  zscore_img() %>% oro2ants()
+cbf_ants <- check_ants(here("../input/niftis/cbf-basil/4156_basil.nii.gz")) %>% 
+  zscore_img() %>% oro2ants()
+reho_ants <- check_ants(here("../input/niftis/reho/4156_rehoStd.nii.gz")) %>% 
+  zscore_img() %>% oro2ants()
+mask <- check_ants(here("input/references/masks/gm10_pcals_rest.nii.gz"))
+out_dir <- here("output/figures/simulation")
+out_name <- 4156 
+fwhm <- 3 
+prop_miss <- 0.9
+sigma <- fwhm / 2.35482
+coord <- c(65, 100, 40)
+
+get_weights <- function(offsets, voxel_dims, sigma) {
+  dists <- t(apply(offsets, 1, function(x, y) x * y, y = voxel_dims))
+  sqNorm <- apply(dists * dists, 1, function(x) sum(x))
+  # Constant doesn't matter because we would rescale by
+  # max weight so that center voxel would be be 1
+  return(exp(-1 * sqNorm / (2 * sigma^2)))
+}
+
+# dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+# 
+# imco(files = list(alff, basil, reho),
+#      brain_mask = mask,
+#      out_dir = out_dir,
+#      out_name = out_name,
+#      fwhm = fwhm,
+#      prop_miss = prop_miss)
+coupling_ants <- check_ants(here("output/figures/simulation/4156_coupling.nii.gz"))
+```
+
+```{r}
+alff_nhood <- getNeighborhoodAtVoxel(alff_ants, coord, kernel = c(3, 3, 3))$values
+cbf_nhood <- getNeighborhoodAtVoxel(cbf_ants, coord, kernel = c(3, 3, 3))$values
+reho_nhood <- getNeighborhoodAtVoxel(reho_ants, coord, kernel = c(3, 3, 3))$values
+coupling_nhood <- getNeighborhoodAtVoxel(coupling_ants, coord, kernel = c(3, 3, 3))
+offsets <- t(t(coupling_nhood$indices) - coord)
+
+weights <- get_weights(offsets, c(2, 2, 2), sigma)
+weight_norm <- weights / sum(weights)
+
+alff_cbf_df <- data.frame(alff = alff_nhood, cbf = cbf_nhood, weights = weight_norm)
+```
+
+# Calculate WLR vs PCA
+```{r}
+lm_alff_cbf <- lm(alff ~ cbf, data = alff_cbf_df, weights = weight_norm)$coefficients
+lm_cbf_alff <- lm(cbf ~ alff, data = alff_cbf_df, weights = weight_norm)$coefficients
+
+wt_cov <- cov.wt(t(rbind(alff_nhood, cbf_nhood)), wt = weights)$cov
+eigen_val <- eigen(wt_cov)
+princomp_val <- princomp(cor = FALSE, covmat = wt_cov)
+coupling <- 2 * eigen_val$values[1]/(eigen_val$values[1] + eigen_val$values[2]) - 1; coupling
+logit_coupling <- log(coupling) - log(1 - coupling); logit_coupling
+```
+
+# Plotting WLR vs PCA (x is CBF)
+```{r}
+eigen_major <- eigen_val$vectors[1, 1] / eigen_val$vectors[2, 1]
+eigen_minor <- eigen_val$vectors[1, 2] / eigen_val$vectors[2, 2]
+eigen_center_x <- with(alff_cbf_df, weighted.mean(cbf, w = weights))
+eigen_center_y <- with(alff_cbf_df, weighted.mean(alff, w = weights))
+
+ggplot(alff_cbf_df) + 
+  geom_point(aes(cbf, alff, size = weights), colour = "grey69") + 
+  geom_abline(intercept = lm_alff_cbf[1], 
+              slope = lm_alff_cbf[2], color = "#0072B2") + # alff ~ cbf
+  geom_abline(intercept = - lm_cbf_alff[1] / lm_cbf_alff[2], 
+              slope = 1 / lm_cbf_alff[2], color = "#D55E00") + # cbf ~ alff
+  geom_abline(intercept = eigen_center_y - eigen_major * eigen_center_x, slope = eigen_major) + # major axis of PCA ellipse
+  geom_abline(intercept = eigen_center_y - eigen_minor * eigen_center_x, slope = eigen_minor) + # minor axis of PCA ellipse
+  geom_ellipse(aes(x0 = eigen_center_x, y0 = eigen_center_y, 
+                   a = 5 * sqrt(eigen_val$values[1]), 
+                   b = 5 * sqrt(eigen_val$values[2]), 
+                   angle = atan(eigen_major))) +
+  coord_fixed() +
+  labs(x = "CBF", y = "ALFF") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5))
+```
+
+# Plotting WLR vs PCA (x is ALFF)
+```{r}
+line_size <- 2
+eigen_minor <- eigen_val$vectors[1, 1] / eigen_val$vectors[1, 2]
+eigen_major <- eigen_val$vectors[2, 1] / eigen_val$vectors[2, 2]
+eigen_center_x <- with(alff_cbf_df, weighted.mean(alff, w = weights))
+eigen_center_y <- with(alff_cbf_df, weighted.mean(cbf, w = weights))
+
+prop_eigen <- eigen_val$values[1] / sum(eigen_val$values)
+coupling_val <- log(prop_eigen) - log(1 - prop_eigen)
+
+wlrpca <- ggplot(alff_cbf_df) + 
+  geom_ellipse(aes(x0 = eigen_center_x, y0 = eigen_center_y, 
+                   a = 5 * sqrt(eigen_val$values[1]), 
+                   b = 5 * sqrt(eigen_val$values[2]), 
+                   angle = atan(eigen_major)),
+               size = line_size, color = "grey22") +
+  geom_abline(intercept = eigen_center_y - eigen_major * eigen_center_x, slope = eigen_major, size = line_size, color = "grey22") + # major axis of PCA ellipse
+  geom_abline(intercept = eigen_center_y - eigen_minor * eigen_center_x, slope = eigen_minor, size = line_size, color = "grey22") + # minor axis of PCA ellipse
+  geom_abline(intercept = lm_cbf_alff[1], 
+              slope = lm_cbf_alff[2], color = "#0072B2", size = line_size) + # cbf ~ alff, blue
+  geom_abline(intercept = - lm_alff_cbf[1] / lm_alff_cbf[2], 
+              slope = 1 / lm_alff_cbf[2], color = "#D55E00", size = line_size) + # alff ~ cbf, red
+  geom_point(aes(alff, cbf, size = weights), colour = "grey69", show.legend = F) + 
+  # annotate(geom = "text", 
+  #          label = paste0("Proportional first eigenvalue: ", round(prop_eigen, 2), 
+  #                         "\nCoupling value: ", round(coupling_val, 2)), 
+  #          x = 5, y = 2, hjust = 0) +
+  coord_fixed() +
+  labs(x = "ALFF", y = "CBF") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); wlrpca
+
+ggsave(filename = here("output/figures/simulation/wlrpca.png"), plot = wlrpca, type = "cairo-png", width = 15.083, height = 10, dpi = 300)
+```
+
