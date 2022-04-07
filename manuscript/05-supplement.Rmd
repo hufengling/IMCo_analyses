@@ -1,5 +1,10 @@
 # Supplementary Materials
 
+```{r supplement, fig.cap = "A) Voxel-wise means across subjects of cortical CBF. B) Voxel-wise variances across subjects of cortical CBF. C) Voxel-wise means across subjects of cortical ALFF. D) Voxel-wise variances across subjects of cortical ALFF. E) Voxel-wise means across subjects of cortical ReHo. F) Voxel-wise variances across subjects of cortical ReHo."}
+knitr::include_graphics("figures/supplement-01.png")
+```
+
+<!---
 ```{r cbf, fig.cap = "A) Voxel-wise means across subjects of cortical CBF. B) Voxel-wise variances across subjects of cortical CBF. C) Thresholded maps of voxels with significant CBF associations with age after FDR correction at 0.05. D) Thresholded maps of voxels with significant CBF associations with sex after FDR correction at 0.05."}
 knitr::include_graphics("figures/cbf_all-01.png")
 ```
@@ -11,3 +16,4 @@ knitr::include_graphics("figures/alff_all-01.png")
 ```{r reho, fig.cap = "A) Voxel-wise means across subjects of cortical ReHo. B) Voxel-wise variances across subjects of cortical ReHo. C) Thresholded maps of voxels with significant ReHo associations with age after FDR correction at 0.05. D) Thresholded maps of voxels with significant ReHo associations with sex after FDR correction at 0.05."}
 knitr::include_graphics("figures/reho_all-01.png")
 ```
+--->

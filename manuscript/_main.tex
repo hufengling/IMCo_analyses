@@ -92,48 +92,55 @@
 \newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
-\usepackage{booktabs}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-\usepackage[]{natbib}
-\bibliographystyle{plainnat}
 
 \title{Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition}
 \author{true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true \and true}
-\date{02 January, 2022}
+\date{21 February, 2022}
 
 \begin{document}
 \maketitle
 
-{
-\setcounter{tocdepth}{2}
-\tableofcontents
-}
 \hypertarget{credit-author-statement}{%
-\section{CRediT author statement}\label{credit-author-statement}}
+\section*{CRediT author statement}\label{credit-author-statement}}
+\addcontentsline{toc}{section}{CRediT author statement}
 
-Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing - Original Draft, Writing - Review \& Editing, Visualization
+\textbf{Fengling Hu:} Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing -- Original Draft, Writing -- Review \& Editing, Visualization. \textbf{Sarah M. Weinstein:} Methodology, Software, Formal analysis, Investigation, Writing -- Review \& Editing. \textbf{Erica B. Baller:} Investigation, Resources, Writing -- Review \& Editing. \textbf{Alessandra M. Valcarcel:} Conceptualization, Methodology, Software, Investigation. \textbf{Azeez Adebimpe:} Software, Investigation, Resources, Data Curation. \textbf{Armin Raznahan:} Conceptualization, Writing -- Review \& Editing. \textbf{David R. Roalf:} Conceptualization, Writing -- Review \& Editing. \textbf{Timothy E. Robert-Fitzgerald:} Methodology, Software, Data Curation, Visualization. \textbf{Virgilio Gonzenbach:} Methodology, Software, Visualization. \textbf{Ruben C. Gur:} Conceptualization, Investigation, Resources, Funding acquisition. \textbf{Raquel E. Gur:} Conceptualization, Investigation, Resources, Funding acquisition. \textbf{Simon Vandekar:} Conceptualization, Software, Formal analysis, Investigation, Writing -- Review \& Editing. \textbf{John A. Detre:} Conceptualization, Writing -- Review \& Editing. \textbf{Kristin A. Linn:} Conceptualization, Software, Formal analysis, Investigation, Writing -- Review \& Editing, Funding acquisition. \textbf{Aaron Alexander-Bloch:} Methodology, Software, Formal analysis, Investigation, Resources. \textbf{Theodore D. Satterthwaite:} Conceptualization, Validation, Investigation, Resources, Data Curation, Writing -- Review \& Editing, Supervision, Project administration, Funding acquisition. \textbf{Russell T. Shinohara:} Conceptualization, Methodology, Validation, Investigation, Resources, Writing -- Review \& Editing, Supervision, Project administration, Funding acquisition
 
-TODO
-
-\url{https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement}
+\newpage
 
 \hypertarget{abstract}{%
-\section{Abstract}\label{abstract}}
+\section*{Abstract}\label{abstract}}
+\addcontentsline{toc}{section}{Abstract}
 
-When individual subjects undergo imaging with multiple modalities, biological information is present not only within each modality, but also between modalities - that is, in how modalities covary at the voxel level. Previous studies have shown that the covariance structures between modalities, or intermodal coupling (IMCo), can be estimated between two modalities, and that two-modality IMCo reveals otherwise undiscovered patterns in neurodevelopment as well as other processes. However, previous IMCo methods are based on the slopes of local weighted linear regression lines, which are inherently asymmetric and limited to the two-modality setting. Here, we present a PCA-based generalization of IMCo regression which uses local covariance decompositions to define a symmetric, voxel-wise coupling coefficient valid for two or more modalities. We then use this method to study coupling between cerebral blood flow, resting state activations, and functional connectivity in 803 subjects between ages 8 and 23. We demonstrate that coupling is spatially heterogeneous and varies with respect to age and sex over the course of neurodevelopment. As availability of multi-modal data increases, PCA-based IMCo offers a natural approach for summarizing relationships between multiple aspects of brain structure and function. An R package is provided.
+When individual subjects are imaged with multiple modalities, biological information is present not only within each modality, but also between modalities -- that is, in how modalities covary at the voxel level. Previous studies have shown that local covariance structures between modalities, or intermodal coupling (IMCo), can be summarized for two modalities, and that two-modality IMCo reveals otherwise undiscovered patterns in neurodevelopment and certain diseases. However, previous IMCo methods are based on the slopes of local weighted linear regression lines, which are inherently asymmetric and limited to the two-modality setting. Here, we present a generalization of IMCo estimation which uses local covariance decompositions to define a symmetric, voxel-wise coupling coefficient that is valid for two or more modalities. We use this method to study coupling between cerebral blood flow, amplitude of low frequency fluctuations, and local connectivity in 803 subjects ages 8 through 22. We demonstrate that coupling is spatially heterogeneous, varies with respect to age and sex in neurodevelopment, and reveals patterns that are not present in individual modalities. As availability of multi-modal data continues to increase, principal-component-based IMCo (pIMCo) offers a powerful approach for summarizing relationships between multiple aspects of brain structure and function. An R package for estimating pIMCo is available at: \url{https://github.com/hufengling/pIMCo}.
+
+\hypertarget{keywords}{%
+\subsection*{Keywords}\label{keywords}}
+\addcontentsline{toc}{subsection}{Keywords}
+
+Intermodal coupling; neurodevelopment; MRI; connectivity; resting state fMRI; cerebral blood flow
+
+\newpage
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-There is increased availability of multi-modality neuroimaging data on individual subjects, where each modality contains unique information about brain structure or function {[}TOCITE{]}. Such data allow us to explore patternss in individual modalities and how patterns in individual modalities relate to each other. In addition to these comparisons, multi-modal data allows us to observe the local covariance structure, or intermodal coupling (IMCo), between modalities \citep{ballerDevelopmentalCouplingCerebral2021, valcarcelMIMoSAAutomatedMethod2018, vandekarSubjectlevelMeasurementLocal2016}. This local covariance structure can be interpreted as how modalities relate with respect to one another at the voxel level in individual subjects.
+There is increased availability of multi-modality neuroimaging data on individual subjects, with each modality containing unique information about brain structure or function. Such data allow us to explore patterns in individual modalities as well as patterns in the relationships between modalities, which we call intermodal coupling (IMCo), at global, regional, or local resolutions (\protect\hyperlink{ref-ballerDevelopmentalCouplingCerebral2021}{Baller et al., 2021}; \protect\hyperlink{ref-guHeritabilityInterindividualVariability2021}{Gu et al., 2021}; \protect\hyperlink{ref-honeyPredictingHumanRestingstate2009}{Honey et al., 2009}; \protect\hyperlink{ref-shokri-kojoriCorrespondenceCerebralGlucose2019}{Shokri-Kojori et al., 2019}; \protect\hyperlink{ref-takAssociationsRestingStateFMRI2015}{Tak et al., 2015}; \protect\hyperlink{ref-uddinComplexRelationshipsStructural2013}{Uddin, 2013}; \protect\hyperlink{ref-valcarcelDualModelingApproach2018}{Valcarcel et al., 2018a}, \protect\hyperlink{ref-valcarcelMIMoSAAutomatedMethod2018}{2018b}; \protect\hyperlink{ref-vandekarSubjectlevelMeasurementLocal2016}{Vandekar et al., 2016}). The progress made by these IMCo studies have transformed our understanding of the brain, and it suggests that advancements in the methodology for studying IMCo have the potential to further enable such insights.
 
-Previous studies have shown IMCo analysis is complementary to single-modality analysis and unveils otherwise undetectable findings {[}TOCITE{]}. For example, in neurodevelopment, IMCo between cortical thickness and sulcal depth has suggested the cortical sheet is generally thinner in sulcal locations when compared to gyral locations, though this relationship was more spatially heterogeneous than previously described \citep{vandekarSubjectlevelMeasurementLocal2016}. Additionally, this study showed the strength of coupling was lower in males compared to females and decreased with age. A separate study exploring IMCo between cerebral blood flow and amplitude of low frequency fluctuations (ALFF) showed that age-related declines in neurovascular coupling occurred most drastically during mid-adolescence and were enriched in the dorsal attention network \citep{ballerDevelopmentalCouplingCerebral2021}. There were also differences in CBF-ALFF coupling between males and females; these differences were enriched in the frontoparietal network. In multiple sclerosis, IMCo has also shown use as a data augmentation tool to improve predictive accuracy of an automated lesion detection model over models using individual modality data alone \citep{valcarcelDualModelingApproach2018, valcarcelMIMoSAAutomatedMethod2018}.
+On the global scale, intermodal relationships have long been of interest. For example, structural connectivity (SC) and functional connectivity (FC) are strongly correlated in adults, but the relationship is less straightforward in children (\protect\hyperlink{ref-uddinComplexRelationshipsStructural2013}{Uddin, 2013}). Gu et al.~built on this global understanding of SC-FC coupling by exploring higher-resolution regional relationships -- they found SC-FC coupling to be strongest in visual and subcortical areas with high SC (\protect\hyperlink{ref-guHeritabilityInterindividualVariability2021}{Gu et al., 2021}).
 
-In these prior studies, each voxel-wise coupling value was defined as the slope of the weighted regression lines fit within a local neighborhood between two modalities. However, since this method of calculating IMCo is based on regression slopes, it does not take into account voxel-level correlation and also suffers from inherent asymmetry, where coupling values depend on the order in which modalities are listed. For example, depending on which modality is the reference modality, a coupling value, \(m\), will change to its inverse, \(1 / m\); this issue is especially problematic for coupling values with very small or very large magnitudes. Thus, this asymmetry necessitates arbitrary, yet influential, decision-making when it comes to analysis and inhibits straight-forward interpretation. Such a measure for IMCo is also limited to only two modalities, so the study of coupling between more than two modalities would require analysis of all pairwise coupling maps. As the number of total modalities increase, this can quickly become overwhelming to interpret.
+In addition to structure-function relationships, regional relationships between metabolism and brain function have also been explored. In the study of energy utilization in the brain, Shokri-Kojori et al.~showed that regional correspondence between cerebral glucose metabolism and fluctuations in blood oxygenation not only differed between brain networks in healthy patients but was also sensitive to differences between patients with acute or chronic alcohol use (\protect\hyperlink{ref-shokri-kojoriCorrespondenceCerebralGlucose2019}{Shokri-Kojori et al., 2019}). Of note, these relationships were not identifiable by looking at individual modalities alone. Another regional study on metabolism-function coupling identified significant associations between cerebral blood flow (CBF) and strength of functional connectivity in default, frontoparietal, and primary sensory-motor networks. No significant association was found between CBF and functional connectivity strength in regions outside of these networks (\protect\hyperlink{ref-takAssociationsRestingStateFMRI2015}{Tak et al., 2015}).
 
-We propose a novel, principal component analysis (PCA) based method for estimating IMCo that uses local covariance decomposition to define symmetric voxel-wise coupling values valid for two or more modalities that reduce the complex local covariance structures into a single value. Thus, our approach provides a more natural and interpretable way of describing coupling in settings with two modalities and allows for simplified study of overall local covariance structure in settings with more than two modalities. To demonstrate its sensitivity to biologically relevant patterns, we show PCA-based IMCo uncovers differences in three-modality coupling with respect to age and sex throughout neurodevelopment.
+On the sub-regional local scale, studies from our group on coupling between cortical thickness and sulcal depth have suggested the cortical sheet is generally thinner in sulcal locations than in gyral locations and that this relationship was more spatially heterogeneous than previously described (\protect\hyperlink{ref-vandekarSubjectlevelMeasurementLocal2016}{Vandekar et al., 2016}). A separate study exploring local IMCo between CBF and resting-state amplitude of low-frequency fluctuations (ALFF) showed that age-related declines in this measure of neurovascular coupling were most pronounced during mid-adolescence and were enriched in the dorsal attention network (\protect\hyperlink{ref-ballerDevelopmentalCouplingCerebral2021}{Baller et al., 2021}). There were also differences in CBF-ALFF coupling between males and females which were enriched in the frontoparietal network.
+
+In these local IMCo studies, each vertex-wise coupling value was defined as the slope of the weighted linear regression (WLR) best-fit line for that local neighborhood between two modalities. However, because this method of calculating IMCo is based on regression slopes, it does not take into account vertex-level correlation and also suffers from inherent asymmetry, where coupling values depend on which modality is defined as the independent variable in the WLR. This asymmetry necessitates arbitrary, yet influential, choices when it comes to analysis and limits straightforward interpretation. This measure for IMCo is also limited to only two modalities, so the study of coupling between more than two modalities using this method would require analysis of all pairwise couplings. As the number of total modalities increases, this approach can become challenging to interpret. Additionally, analysis of all pairwise couplings may not parsimoniously describe the overall degree of coupling across all modalities.
+
+In response to these limitations, we propose a principal component analysis (PCA) based method for estimating IMCo that uses local covariance decomposition to define symmetric voxel-wise coupling values valid for two or more modalities. This method reduces complex local covariance structures into a single value, thus providing an easily interpretable value that characterizes the strength of coupling in settings with two modalities. It also allows for simplified study of more complex local covariance structures in settings with more than two modalities.
+
+To demonstrate its sensitivity to biologically relevant patterns, we show that PCA-based IMCo (pIMCo) uncovers differences in three-modality coupling between CBF, ALFF, and regional homogeneity (ReHo) with respect to age and sex in youth. We chose these modalities because local cortical coupling between vascular organization and resting state fluctuations has been previously characterized. Additionally, while resting state fluctuations can be thought of as a more global property, regional homogeneity is more related to local connectivity. Thus, we were interested in understanding the coupling between cerebral blood flow and both long-range fluctuations and local connectivity.
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
@@ -141,139 +148,325 @@ We propose a novel, principal component analysis (PCA) based method for estimati
 \hypertarget{subjects}{%
 \subsection{Subjects}\label{subjects}}
 
-We included 803 subjects (340 males) from ages 8-23 (mean = 15.6; sd = 3.3) from the Philadelphia Neurodevelopmental Cohort (PNC) \citep{satterthwaite_neuroimaging_2014}. Of the 1445 PNC subjects who underwent neuroimaging, we initially excluded those meeting any of the following criteria: history of psychoactive medication (n = 165), history of inpatient psychiatric hospitalization (n = 51), or history of medical disorders that could impact brain function (n = 166). From the remaining 1113 subjects, we included those who underwent the combination of T1-weighted MRI, arterial spin labeling MRI (ASL), and resting state fMRI (rfMRI) scanning, each of acceptable image quality as determined based on automated and manual screening. This resulted in the final set of 803 subjects used for this study.
+We included 803 subjects (340 males) from ages 8-22 (mean = 15.6; sd = 3.3) from the Philadelphia Neurodevelopmental Cohort (PNC) (\protect\hyperlink{ref-satterthwaite_neuroimaging_2014}{Satterthwaite et al., 2014}). Of the 1,601 PNC subjects who underwent neuroimaging, health screening as well as automated and manual image quality screening were performed. We excluded subjects in the following order: low T1-weighted MRI quality (n = 61), low resting-state fMRI (rfMRI) quality (n = 450), and low arterial spin labeling (ASL) quality (n = 54). Of the remaining subjects, we then excluded those meeting any of the following health exclusion criteria (n = 205): history of psychoactive medication, history of inpatient psychiatric hospitalization, or history of medical disorders that could impact brain function. Finally, ASL scans for which high-quality partial volume correction could not be performed were excluded (n = 28). This resulted in the final set of 803 subjects used for this study.
 
-The Institutional Review Boards of the University of Pennsylvania and the Children's Hospital of Pennsylvania approved all study procedures. All study subjects gave informed consent; for subjects under the age of 18, parents or guardians provided consent and subjects provided assent. Additional details of the PNC study have been previously described \citep{satterthwaite_neuroimaging_2014}.
+The Institutional Review Boards of the University of Pennsylvania and the Children's Hospital of Pennsylvania approved all study procedures. All adult study subjects gave written informed consent; for subjects under the age of 18, parents or guardians provided written informed consent and subjects provided assent. Additional details of the PNC study have been previously described (\protect\hyperlink{ref-gurStructuralFunctionalBrain2020}{Gur et al., 2020}; \protect\hyperlink{ref-satterthwaite_neuroimaging_2014}{Satterthwaite et al., 2014}).
 
 \hypertarget{image-acquisition}{%
 \subsection{Image acquisition}\label{image-acquisition}}
 
-All PNC imaging was acquired using a single 3T Siemens Tim Trio scanner with a 32-channel head coil. To minimize motion, subject heads stabilized using one foam pad over each ear and one over the top of the head. Image acquisition procedures have been previously described \citep{satterthwaite_neuroimaging_2014}.
+All PNC imaging was acquired using a single 3T Siemens Tim Trio scanner with a 32-channel head coil. To minimize motion, subjects' heads were stabilized using one foam pad over each ear and one foam pad over the top of the head. Image acquisition procedures have been previously described (\protect\hyperlink{ref-gurStructuralFunctionalBrain2020}{Gur et al., 2020}; \protect\hyperlink{ref-satterthwaite_neuroimaging_2014}{Satterthwaite et al., 2014}).
 
-T1 structural images were used for alignment of all scans into common space. T1 images by 3D-encoded magnetization-prepared, rapid acquisition gradient echo (MPRAGE) T1-weighted sequence with the following settings: \(T_R\) = 1810 ms; \(T_E\) = 3.51 ms; FoV = 180 × 240 mm; matrix size = 192 x 256; number of slices = 160; slice thickness = 1 mm; inter-slice gap = 0 mm; resolution = 0.9375 × 0.9375 × 1 mm. Cerebral blood flow (CBF) was estimated from a 3D-encoded spin-echo pseudo-continuous arterial spin labeling (pCASL) sequence with the following settings: \(T_R\) = 4000 ms; \(T_E\) = 15 ms; FoV = 220 × 220 mm; matrix size = 96 x 96; number of slices = 20; slice thickness = 5 mm; inter-slice gap = 1 mm; resolution = 2.3 x 2.3 x 6 mm; 80 volumes. Maps of amplitude of low frequency fluctuations (ALFF) and regional homogeneity (ReHo) were estimated from six minutes of task-free functional data from a blood oxygen level-dependent (BOLD-weighted) 2D EPI sequence with the following settings: \(T_R\) = 3000 ms; \(T_E\) = 32 ms; FoV = 192 × 192 mm; matrix size = 64 x 64; number of slices = 46; slice thickness = 3 mm; inter-slice gap = 0 mm; resolution = 3 mm isotropic; 124 volumes. Subjects were instructed to stay awake, keep their eyes open and fixated on a displayed fixation cross, and remain still.
+T1-weighted structural images were used for alignment of all scans into a common space. T1-weighted images were acquired using a 3D-encoded magnetization-prepared, rapid-acquisition gradient echo (MPRAGE) T1-weighted sequence with the following settings: \(T_R\) = 1810 ms; \(T_E\) = 3.51 ms; FoV = 180 × 240 mm; matrix size = 192 x 256; number of slices = 160; slice thickness = 1 mm; inter-slice gap = 0 mm; resolution = 0.9375 × 0.9375 × 1 mm. Cerebral blood flow (CBF) was estimated from a pseudo-continuous arterial spin labeling (pcASL) sequence with a spin-echo echoplanar readout and the following settings: \(T_R\) = 4000 ms; \(T_E\) = 15 ms; FoV = 220 × 220 mm; matrix size = 96 x 96; number of slices = 20; slice thickness = 5 mm; inter-slice gap = 1 mm; resolution = 2.3 x 2.3 x 6 mm; 80 volumes. Maps of amplitude of low frequency fluctuations (ALFF) and regional homogeneity (ReHo) were estimated from six minutes of task-free functional data from a blood-oxygen-level-dependent (BOLD) weighted 2D EPI sequence with the following settings: \(T_R\) = 3000 ms; \(T_E\) = 32 ms; FoV = 192 × 192 mm; matrix size = 64 x 64; number of slices = 46; slice thickness = 3 mm; inter-slice gap = 0 mm; resolution = 3 mm isotropic; 124 volumes. Subjects were instructed to stay awake, keep their eyes open, fixate on a displayed fixation cross, and remain still.
 
 \hypertarget{image-processing}{%
 \subsection{Image processing}\label{image-processing}}
 
-TODO
+Image processing of T1-weighted structural images, pcASL scans, and rfMRI scans have been previously described (\protect\hyperlink{ref-ballerDevelopmentalCouplingCerebral2021}{Baller et al., 2021}; \protect\hyperlink{ref-gurStructuralFunctionalBrain2020}{Gur et al., 2020}). They are summarized here in brief. T1-weighted structural images were processed using tools from Advanced Normalization Tools (ANTs) (\protect\hyperlink{ref-tustisonLargescaleEvaluationANTs2014}{Tustison et al., 2014}). pcASL and rfMRI scans were processed using an eXtensible Connectivity Pipeline (XCP) which included tools from FSL and AFNI (\protect\hyperlink{ref-ciricMitigatingHeadMotion2018}{Ciric et al., 2018}; \protect\hyperlink{ref-cox1996afni}{Cox, 1996}; \protect\hyperlink{ref-jenkinson2012fsl}{Jenkinson et al., 2012}).
 
-\hypertarget{estimation-of-intermodal-coupling}{%
-\subsection{Estimation of intermodal coupling}\label{estimation-of-intermodal-coupling}}
+CBF was quantified from control-label pairs using the following equation:
 
-For each subject, we calculated voxel-wise IMCo between CBF, ALFF, and ReHo modalities. Even though ALFF and ReHo are technically calculated from the same rfMRI modality, we refer to them as separate modalities because they measure different information.
+\(f = \frac{\Delta M \lambda R e^{\omega R}}{2 M_0 \alpha(1-e^{- \tau R})}\),
 
-First, we applied a grey matter mask to each of the three modalities. Then, within each masked modality, we globally scaled intensities to a mean of 0 and a variance of 1. This scaling is necessary because eigendecomposition is later performed on local covariance matrices, so if modalities are defined on drastically different scales, decomposition outputs will reflect differences in baseline overall variance between modalities rather than local covariance structures. Next, for each voxel, we extracted local neighborhoods from each of the three modalities and weighted voxels within these local neighborhoods proportional to a Gaussian kernel over their Euclidean distances from the central voxel - in our study, we used FWHM = 3 which corresponds to 7x7x7 voxel (14x14x14 mm) local neighborhoods and a standard deviation of 1.62 mm for the Gaussian kernel. Then, we calculated the 3x3 weighted covariance matrix between the neighborhoods, performed eigendecomposition on them, and extracted the proportion of variance explained by the first eigenvalue. Once all voxel-wise proportional first eigenvalues were extracted, we scaled these values such that the minimum was 0 and maximum was 1 and then performed a logit transformation so extreme values of coupling would be emphasized. This resulted in our voxel-level coupling value, where a large value means that voxel's local covariance matrix could be well-summarized in a single dimension.
+where f is CBF, \(\Delta M\) is the difference in signal between control and label acquisitions, \(R\) is the longitudinal relaxation rate of blood, \(\tau\) is the labeling time, \(\omega\) is the post-labeling delay, \(\alpha\) is the labeling efficiency, \(\lambda\) is the blood-tissue-water partition coefficient, and \(M_0\) is approximated by the control image intensity. We set \(\alpha = 0.85\), \(\lambda = 0.9g/mL\), \(\tau = 1.6s\), \(\omega = 1.2s\). Partial volume correction was performed using Bayesian Inference for Arterial Spin Labeling MRI (BASIL) (\protect\hyperlink{ref-chappell_partial_2011}{Chappell et al., 2011}; \protect\hyperlink{ref-chappell_variational_2009}{Chappell et al., 2009}).
+
+For rfMRI processing, the XCP pipeline included: 1) field inhomogeneity correction with FSL FUGUE, 2) removal of initial rfMRI volumes, 3) alignment of volumes within the time series to a selected reference volume using FSL MCFLIRT, 4) interpolation of intensity outliers with AFNI 3dDespike, and 5) demeaning and removal of linear or quadratic trends. Images were then denoised using a 36-parameter confound regression model that has been shown to minimize impact of motion artifact (\protect\hyperlink{ref-ciricBenchmarkingParticipantlevelConfound2017}{Ciric et al., 2017}). Finally, BOLD-weighted time series as well as artifactual model time series were filtered using a first-order Butterworth filter with a passband between 0.01 and 0.08 Hertz.
+
+Voxel-wise ALFF was defined as the sum of frequency bins between 0.01 and 0.08 Hertz using a Fourier transform of the time-domain signal (\protect\hyperlink{ref-yangAmplitudeLowFrequency2007}{Yang et al., 2007}). Voxel-wise ReHo was defined as Kendall's coefficient of concordance computed over the rfMRI time series in each voxel's 26-voxel local neighborhood (\protect\hyperlink{ref-zangRegionalHomogeneityApproach2004}{Zang et al., 2004}). Voxel-wise maps were smoothed with a 6mm full width at half maximum (FWHM) kernel to improve signal-to-noise ratio. CBF, ALFF, and ReHo images were co-registered to the the T1-weighted structural image using boundary-based registration and then normalized to a custom adolescent template using the top-performing SyN registration provided by ANTs (\protect\hyperlink{ref-avantsReproducibleEvaluationANTs2011}{Avants et al., 2011}; \protect\hyperlink{ref-ciricTemplateFlowFAIRsharingMultiscale2021}{Ciric et al., 2021}; \protect\hyperlink{ref-greveAccurateRobustBrain2009}{Greve and Fischl, 2009}). Finally, a gray matter mask was generated as the intersection between a gray matter mask from T1-weighted images with 90\% coverage over all subjects and overall coverage masks from registered pcASL and rfMRI scans.
+
+\hypertarget{methodology-for-estimating-pimco}{%
+\subsection{Methodology for estimating pIMCo}\label{methodology-for-estimating-pimco}}
+
+For each subject, we calculated voxel-wise coupling between CBF, ALFF, and ReHo images to produce one pIMCo image per subject. The full pIMCo estimation pipeline is summarized in Figure \ref{fig:workflow}. First, we applied the gray matter mask to each of the three modalities. Then, within each masked modality, we globally scaled intensities to a mean of 0 and a variance of 1. This scaling is necessary because eigendecomposition is later performed on local covariance matrices; if modalities are defined on drastically different scales, decomposition outputs would reflect differences in scale between modalities rather than local covariance structures. Next, for each voxel, we extracted local neighborhoods from each of the three modalities and weighted voxels within these local neighborhoods proportional to a Gaussian kernel over their Euclidean distances from the central voxel -- in our study, we used FWHM = 3, which corresponds to 7x7x7 voxel (14x14x14 mm) local neighborhoods and a standard deviation of 1.62 mm for the Gaussian kernel. Then, we calculated the 3x3 weighted covariance matrix between the neighborhoods, performed eigendecomposition on it, and extracted the proportion of variance explained by the first eigenvalue. Once all the voxel-wise proportional first eigenvalues were extracted, we scaled these values such that their theoretical range was \([0, 1]\) and performed a logit transformation. While such a transformation makes the coupling value more challenging to interpret, it emphasizes extreme values of coupling and changes the domain of coupling values from \([\frac{1}{m}, 1]\) to \((-\infty, \infty)\), where \(m\) is the total number of modalities, in order to improve expected behavior with post-hoc voxel-wise statistical analyses. This resulted in our voxel-level pIMCo image for that subject. For any particular voxel in that image, a large value suggests that the voxel's local covariance matrix across modalities could be well-summarized in a single dimension while a small value suggests multiple dimensions would be necessary to characterize the covariance structure.
 
 For reference, in the three-modality setting, coupling values of -2, 0, and 2 correspond to the first eigenvector explaining 41\%, 67\%, and 92\% of the total variance in that local neighborhood, respectively. In the two-modality setting, coupling values of -2, 0, and 2 correspond to the first eigenvector explaining 56\%, 75\%, and 94\% of the total variance in that local neighborhood, respectively.
+
+\begin{figure}
+\includegraphics[width=212.85in]{figures/Workflow-02-01} \caption{Step-by-step diagram of pIMCo estimation pipeline as described in the Methods. Coupling images are generated from intermodal images for each subject individually. pIMCo estimation is performed at each voxel location across subject-specific images.}\label{fig:workflow}
+\end{figure}
 
 \hypertarget{voxel-wise-statistical-analysis}{%
 \subsection{Voxel-wise statistical analysis}\label{voxel-wise-statistical-analysis}}
 
-We created descriptive coupling maps by taking the means and variances across all 803 subjects at each voxel location in volumetric space. We then projected these mean and variance maps to the FreeSurfer sphere using PySurfer for visualization of spatial heterogeneity and cortical patterns {[}TOCITE{]}.
+We created descriptive coupling maps by taking the means and variances across all 803 subjects' pIMCo values at each voxel location in volumetric space. We then projected these mean and variance images to the cortical surface using PySurfer for visualization of spatial heterogeneity and cortical patterns (\protect\hyperlink{ref-pysurfer}{Waskom et al., 2020}).
 
-To investigate biological relevance of PCA-based IMCo, we used linear regression at each voxel to explore whether coupling was associated with age or sex effects. In all linear regressions, we controlled intra-scanner motion for both ASL and rfMRI scans. To control for multiple comparisons in these voxel-level tests, we controlled the false discovery rate at 5\% \citep{benjaminiControllingFalseDiscovery1995}. Then, we created binary thresholded masks indicating which tests remained significant post-correction for both age and sex. For this and following analyses, we performed identical modeling of each of the three modalities individually to explore whether the presence of age and sex effects on modality intensities corresponded to the presence of age and sex effects on coupling values (Supplementary Materials).
-
-To visualize the extent of voxels where coupling was associated with age and sex, we counted the proportion of voxels with statistically significant age or sex effects in each of the Yeo 7 functional networks as well as in Automated Anatomical Labeling (AAL) atlas subcortical regions of interest \citep{thomasyeoOrganizationHumanCerebral2011, tzourio-mazoyerAutomatedAnatomicalLabeling2002}. We also projected the thresholded p-value maps to the FreeSurfer sphere for visualization and further analyses.
+To investigate the biological relevance of pIMCo, we used linear regression at each voxel to explore whether coupling was associated with age or sex. In all linear regressions, we controlled for in-scanner motion for both ASL and rfMRI scans. To account for multiple comparisons in these voxel-level tests, we controlled the false discovery rate at 5\% (\protect\hyperlink{ref-benjaminiControllingFalseDiscovery1995}{Benjamini and Hochberg, 1995}). Then, we created binary thresholded masks indicating which voxels displayed a significant effect for each of age and sex. For this and following analyses, we performed identical modeling of each of the three modalities individually to explore whether age and sex effects were present and corresponded to the observed associations with pIMCo.
 
 \hypertarget{spin-testing}{%
 \subsection{Spin testing}\label{spin-testing}}
 
-For each of the age and sex thresholded p-value maps projected to the FreeSurfer sphere, we then tested whether the proportion of significant voxels in each functional network was enriched when compared to the proportion of significant voxels overall. Because there is an underlying spatial distribution of significant voxels, we used the spin test \citep{alexander-bloch_testing_2018}. Briefly, the spin test is a conservative, permutation-based test that rotates the FreeSurfer sphere randomly to create an underlying null distribution that preserves spatial patterns. In our study, we estimated the null distribution over 2,000 permutations - for each permutation, we recorded the Jaccard similarity index between the thresholded p-value map and each of the Yeo 7 networks. Finally, for each network, we calculated the p-value as the proportion of null Jaccard similarity indices equal to or greater than the observed Jaccard similarity index.
+To visualize the extent of voxels where coupling was associated with age and sex, we counted the proportion of voxels with statistically significant age or sex effects in each of the Yeo 7 functional networks on the cortex as well as in subcortical regions in the Automated Anatomical Labeling (AAL) atlas (\protect\hyperlink{ref-thomasyeoOrganizationHumanCerebral2011}{Thomas Yeo et al., 2011}; \protect\hyperlink{ref-tzourio-mazoyerAutomatedAnatomicalLabeling2002}{Tzourio-Mazoyer et al., 2002}).
 
-\hypertarget{code-availibility}{%
-\subsection{Code availibility}\label{code-availibility}}
+Next, we tested whether the proportion of significant voxels in each functional network was enriched when compared to the proportion of significant voxels overall. Because there is an underlying spatial distribution of significant voxels, we used the spin test (\protect\hyperlink{ref-alexander-bloch_testing_2018}{Alexander-Bloch et al., 2018}). Briefly, the spin test is a permutation-inspired testing procedure that rotates the FreeSurfer sphere randomly to create an underlying null distribution that preserves spatial patterns. The null hypothesis is that there is no spatial enrichment of significant p-values in the specified functional network compared to across the cortex overall. In our study, we estimated the null distribution over 2,000 permutations -- for each permutation, we recorded the Jaccard similarity index between the thresholded p-value map and each of the Yeo 7 networks. Finally, for each network, we calculated the p-value as the proportion of null Jaccard similarity indices equal to or greater than the observed Jaccard similarity index.
 
-An R package for calculating PCA-based IMCo images is available at: \url{https://github.com/hufengling/IMCo_PCA}. All code for analysis is available at: \url{https://github.com/hufengling/IMCo_analyses}.
+\hypertarget{code-and-data-availibility}{%
+\subsection{Code and data availibility}\label{code-and-data-availibility}}
+
+An R package for calculating pIMCo images is available at: \url{https://github.com/hufengling/pIMCo}. All code for analysis is available at: \url{https://github.com/hufengling/IMCo_analyses}. Software and packages used for pre-processing, pIMCo calculation, or analysis are cited in the references -- R Core Team (\protect\hyperlink{ref-R-base}{2021}); Wickham (\protect\hyperlink{ref-stringr}{2019}); Xie (\protect\hyperlink{ref-R-bookdown}{2021a}); Xie (\protect\hyperlink{ref-R-knitr}{2021b}); Allaire et al. (\protect\hyperlink{ref-R-rmarkdown}{2021}); Xie (\protect\hyperlink{ref-bookdown2016}{2016}); Wickham et al. (\protect\hyperlink{ref-tidyverse}{2019}); Muschelli (\protect\hyperlink{ref-extrantsr}{2021a}); Avants (\protect\hyperlink{ref-antsr}{2020}); Kandel et al. (\protect\hyperlink{ref-antsrcore}{2020}); Müller (\protect\hyperlink{ref-here}{2020}); Fischl (\protect\hyperlink{ref-fischl2012freesurfer}{2012}); Schäfer (\protect\hyperlink{ref-fsformats}{2021}); Jenkinson et al. (\protect\hyperlink{ref-jenkinson2012fsl}{2012}); Muschelli et al. (\protect\hyperlink{ref-muschelli2015fslr}{2015}); Ren (\protect\hyperlink{ref-rlist}{2021}); Muschelli (\protect\hyperlink{ref-neurobase}{2021b}); Yushkevich et al. (\protect\hyperlink{ref-py06nimg}{2006}).
+
+PNC data are publicly available in raw format at \url{https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs000607.v3.p2}.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-\hypertarget{cortical-coupling-voxel-wise-descriptive-maps}{%
-\subsection{Cortical coupling voxel-wise descriptive maps}\label{cortical-coupling-voxel-wise-descriptive-maps}}
+\hypertarget{coupling-varies-across-the-cortical-surface-and-is-increased-in-discrete-regions-bilaterally}{%
+\subsection{Coupling varies across the cortical surface and is increased in discrete regions, bilaterally}\label{coupling-varies-across-the-cortical-surface-and-is-increased-in-discrete-regions-bilaterally}}
 
-We calculated voxel-wise mean and variance maps of coupling values to characterize spatial patterns in CBF-ALFF-ReHo coupling and visualized these on the FreeSurfer sphere. Throughout the cortical surface, all voxels showed strong coupling, and voxels with stronger average coupling also had higher variance between subjects. The average voxel-wise mean coupling value was 0.99 (sd = 0.37; range from 0.27 to 3.30). The average voxel-wise variance was 0.91 (sd = 0.20; range from 0.45 to 2.64).
+We calculated voxel-wise mean and variance maps of coupling values to characterize spatial patterns in CBF-ALFF-ReHo coupling and visualized these on the cortical surface. Throughout the cortical surface, all voxels, on average, showed strong coupling, and voxels with stronger average coupling also tended to have higher variance between subjects (Pearson correlation = 0.69). The average voxel-wise mean coupling value was 0.99 (sd = 0.37; range = \([0.27, 3.30]\)). The average voxel-wise variance was 0.91 (sd = 0.20; range = \([0.45, 2.64]\)).
 
-Visual comparison of voxel-wise descriptive maps with the Desikan-Killiany cortical atlas \citep{desikanAutomatedLabelingSystem2006a} suggests coupling is especially strong in the following regions, bilaterally: superior frontal gyrus, paracentral gyrus, caudal anterior cingulate, posterior cingulate, isthmus cingulate, pericalcarine, lateral occipital, and insula (Figure @ref(fig:desc\_fig) ). These regions also tended to show higher variance.
+Visual comparison of voxel-wise descriptive maps with the Desikan-Killiany cortical atlas (\protect\hyperlink{ref-desikanAutomatedLabelingSystem2006a}{Desikan et al., 2006}) suggested that coupling is especially strong in the following regions, bilaterally: superior frontal gyrus, paracentral gyrus, caudal anterior cingulate, posterior cingulate, isthmus cingulate, pericalcarine, lateral occipital, and insula (Figure \ref{fig:desc}). Comparing to the Yeo 7 functional networks, areas of strong coupling are observed primarily in the frontoparietal (p = 0.0125) and default networks (p = 0.039; Figure \ref{fig:barplot}).
+
+These voxel-wise descriptive maps of coupling showed unique information when compared to the descriptive maps of each of the individual modalities (Supplementary Figure \ref{fig:supplement}).
 
 \begin{figure}
-\includegraphics[width=100.01in]{figures/coupling_desc-01} \caption{Test}(\#fig:desc_fig)
+\includegraphics[width=100.01in]{figures/coupling_desc-01} \caption{Coupling values are spatially heterogeneous across the cortical surface. A) Voxel-wise means across subjects of cortical coupling values between CBF, ALFF, and ReHo. Larger values indicate stronger coupling. B) Voxel-wise variances across subjects of cortical coupling values between CBF, ALFF, and ReHo.}\label{fig:desc}
 \end{figure}
 
-Comparing to the Yeo 7 functional networks, areas of strong coupling are observed primarily in the default and frontoparietal networks. Small portions of the visual network as well as other networks also show strong coupling, though those patterns were less apparent.
-
-These voxel-wise descriptive maps of coupling showed unique information to descriptive maps of each of the individual modalities (TOCITE SUPPLEMENT).
+\begin{figure}
+\includegraphics[width=62.83in]{figures/joint_barplots_norace} \caption{Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; significant p-values are reported (p < 0.05).}\label{fig:barplot}
+\end{figure}
 
 \hypertarget{cbf-alff-reho-coupling-evolves-with-age-throughout-gray-matter-structures}{%
 \subsection{CBF-ALFF-ReHo coupling evolves with age throughout gray matter structures}\label{cbf-alff-reho-coupling-evolves-with-age-throughout-gray-matter-structures}}
 
-Linear associations between strength of coupling and age were present in subcortical structures and cortical networks (TOCITE FIG; corrected p \textless{} 0.05). In subcortical structures, age-related changes in CBF-ALFF-ReHo coupling occurred primarily in the caudate and pallidum, though such changes were also observed in sizable proportions of the hippocampus, putamen, and thalamus.
+Linear associations between strength of coupling and age were present in subcortical structures and cortical networks (Figure \ref{fig:barplot}; corrected p \textless{} 0.05). Figure \ref{fig:ageexample} shows an example of such an association between coupling and age as well as individual modalities and age at one voxel in the default network. In subcortical structures, age-related changes in CBF-ALFF-ReHo coupling occurred primarily in the caudate and pallidum, though such changes were also common in the hippocampus, putamen, and thalamus.
 
-In cortical networks, coupling and age associations were rare in all networks except the frontoparietal and default networks (TOCITE FIG BINARY). These two networks were also the networks in which the average strength of coupling across subjects was highest (TOCITE FIG). Spin testing between functional networks and age-related changes in coupling showed enrichment of coupling and age associations in the frontoparietal (p = 0.013) and default networks (p = 0.039).
+In cortical networks, coupling and age associations were rare in all networks except the frontoparietal and default networks (Figure \ref{fig:binary}). These two networks were also the networks in which the average strength of coupling across subjects appeared to be highest (Figure \ref{fig:desc}). Spin testing between functional networks and age-related changes in coupling showed enrichment of coupling and age associations in the frontoparietal (p = 0.013) and default networks (p = 0.039).
+
+\begin{figure}
+\includegraphics[width=62.83in]{figures/modality_by_age} \caption{Example of associations between individual modalities and age as well as associations between coupling and age at a single voxel in the default network. Each point represents the value at that voxel for one subject. Best-fit lines from univariate linear regression are shown.}\label{fig:ageexample}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=100.01in]{figures/coupling_binary-01} \caption{A) Thresholded maps of voxels with significant coupling associations with age after FDR correction at 0.05. B) Thresholded maps of voxels with significant coupling associations with sex after FDR correction at 0.05.}\label{fig:binary}
+\end{figure}
 
 \hypertarget{cbf-alff-reho-coupling-varies-between-males-and-females-primarily-in-subcortical-regions}{%
 \subsection{CBF-ALFF-ReHo coupling varies between males and females, primarily in subcortical regions}\label{cbf-alff-reho-coupling-varies-between-males-and-females-primarily-in-subcortical-regions}}
 
-Associations between CBF-ALFF-ReHo coupling and sex were present primarily in the hippocampus and thalamus (TOCITE FIG; corrected p \textless{} 0.05). Coupling was rare in other subcortical structures and all functional networks - only 1\% to 3\% of voxels in these regions showed coupling and sex associations (TOCITE FIG BINARY).
+Associations between CBF-ALFF-ReHo coupling and sex were present primarily in the hippocampus and thalamus (Figure \ref{fig:barplot}; corrected p \textless{} 0.05). Sex differences in coupling were rare in other subcortical structures and all functional networks -- only 1\% to 3\% of voxels in these regions showed coupling and sex associations (Figure \ref{fig:binary}). Spin testing between functional networks and sex-related changes in coupling revealed enrichment of coupling and sex associations in the frontoparietal network (p = 0.012), despite the small proportion of the frontoparietal network that exhibited coupling associations with sex.
 
-Spin testing between functional networks and sex-related changes in coupling revealed enrichment of coupling and sex associations in the frontoparietal network (p = 0.012), despite the small proportion of the frontoparietal network that exhibited coupling associations with sex.
+\hypertarget{pimco-provides-a-consistent-estimator-of-local-coupling-compared-to-wlr-based-imco}{%
+\subsection{pIMCo provides a consistent estimator of local coupling compared to WLR-based IMCo}\label{pimco-provides-a-consistent-estimator-of-local-coupling-compared-to-wlr-based-imco}}
+
+In 2016, Vandekar et al.~introduced a method to study IMCo relationships at the single voxel level based on local weighted linear regression (WLR) slopes (\protect\hyperlink{ref-vandekarSubjectlevelMeasurementLocal2016}{Vandekar et al., 2016}). Because this method relies on estimating WLR slopes between modalities, it is inherently limited to the two-modality setting, cannot account for statistical relationship between modalities, and requires specification of one modality as the independent variable, leading to asymmetry. These limitations are demonstrated by a two-modality example in Figure \ref{fig:wlrpca}. We see that, if ALFF is defined as the independent variable, the WLR coupling value is 0.25, indicating little coupling, but if CBF is defined as the independent variable, the WLR coupling value is 1.25, indicating five times as much coupling. Thus, when using WLR-based IMCo, two possible coupling values exist at every voxel, and there isno guarantee analyses will show comparable findings between the two. Additionally, these WLR coupling values only describe the trend of the relationship between ALFF and CBF, but do not account for the statistical strength of that relationship.
+
+In contrast, the pIMCo coupling value is 2.13 and does not require specification of which modality is treated as the independent variable, leading to a symmetric and consistent definition of coupling. This pIMCo value does not describe the effect size of the relationship between ALFF and CBF and instead describes the strength and shape of the relationship -- a high value of coupling suggests that the shape of data from that neighborhood looks like a long ellipsoid, while a low value of coupling suggests that the shape is more spherical.
+
+\begin{figure}
+\includegraphics[width=62.83in]{figures/wlrpca} \caption{Two-modality example showing pIMCo results in comparison to WLR-based IMCo results. Blue line represents coupling value from WLR-based IMCo if ALFF is defined as the independent variable (slope = 0.25). Orange line represents coupling value from WLR-based IMCo if CBF is defined as the independent variable (slope = 1.25). Black line and ellipse represent PCA results; no reference specification is needed (coupling value = 2.13). Larger dot sizes correspond to increased weights in the WLR and weighted PCA.}\label{fig:wlrpca}
+\end{figure}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
-As growing emphasis is placed on the acquisition multi-modal data, new methodologies are necessary to enable these analyses. In 2016, Vandekar et al.~introduced a method based on local regression slopes to study IMCo relationships at the single voxel level and showed it could reveal patterns between cortical thickness and sulcal depth that had been undiscovered by studies conducted on regions of interest or across the entire cortex \citep{vandekarSubjectlevelMeasurementLocal2016}. Since then, this method for studying local coupling has continued to enable discoveries \citep{ballerDevelopmentalCouplingCerebral2021}. However, despite its strengths, because this method relies on estimating regression slopes between modalities, it is inherently limited to the two-modality setting, cannot take correlation between modalities into account, and is asymmetric.
+As growing emphasis is placed on the acquisition of multi-modal data, new methodologies are necessary to enable these analyses. In this manuscript, we introduce pIMCo, a generalized approach to estimating local IMCo that can be applied to two or more modalities, can be interpreted as a direct summary of local covariance matrices, and is symmetric (Figure \ref{fig:wlrpca}). Our method can be used with any combination of volumetric images to produce single-subject, voxel-resolution coupling images which can then be analyzed using standard techniques. We applied our proposed method to show significant coupling between cerebral blood flow, resting state fluctuations, and local connectivity throughout the brain. We then used voxel-level analyses to characterize how coupling varies in neurodevelopment.
 
-In this manuscript, we introduce a generalized approach to estimating IMCo that can be applied to two or more modalities, can be interpreted as a direct summary of local covariance matrices, and is symmetric. This method can be used with any combination of volumetric images to produce single-subject, voxel-resolution coupling images which can then be analyzed using standard techniques. We applied this method to show significant coupling between cerebral blood flow, resting state activations, and local connectivity throughout the brain. We then used voxel-level analyses to characterize how coupling varies in neurodevelopment.
+\hypertarget{coupling-of-cerebral-blood-flow-resting-state-fluctuations-and-local-connectivity-vary-with-age-and-sex}{%
+\subsection{Coupling of cerebral blood flow, resting state fluctuations, and local connectivity vary with age and sex}\label{coupling-of-cerebral-blood-flow-resting-state-fluctuations-and-local-connectivity-vary-with-age-and-sex}}
 
-\hypertarget{coupling-of-blood-flow-resting-state-activation-and-connectivity-vary-with-age-and-sex}{%
-\subsection{Coupling of blood flow, resting state activation, and connectivity vary with age and sex}\label{coupling-of-blood-flow-resting-state-activation-and-connectivity-vary-with-age-and-sex}}
+We found that CBF-ALFF-ReHo coupling was spatially heterogeneous and varied with age and sex in neurodevelopment in both subcortical structures and functional networks.These findings, which uncover otherwise undetectable intermodal interactions, are unique to those from individual modality analyses.
 
-We found CBF-ALFF-ReHo coupling was spatially heterogeneous and varied with age and sex in neurodevelopment in subcortical structures and cortical networks. These findings are unique to those from individual modality analyses, uncovering otherwise undetectable intermodal interactions. We noticed regions with high CBF-ALFF-ReHo coupling across subjects also tended to have high variance in coupling. This suggests these regions may be biologically interesting in the context of CBF-ALFF-ReHo coupling. However, it is uncertain whether this signal is driven by local changes across all subjects, specific subject-level phenotypes, or something else entirely. In future studies, we will investigate such regions further to explain this heterogeneity.
+We noticed that regions with higher CBF-ALFF-ReHo coupling across subjects also tended to have higher variance in coupling. This suggests that these regions may be biologically interesting in the context of CBF-ALFF-ReHo coupling and important regions for future exploration, since they appear to demonstrate pronounced differences in coupling phenotypes between subjects and could be associated with other variables of interest, such as clinical phenotypes.
 
-Spin testing showed the high proportion of coupling-age associations in the frontoparietal and default networks were enriched when compared to the cortex overall. This suggests that, not only do vascular organization, resting state activation, and connectivity change individually in neurodevelopment, but the strength of interaction between these features also changes. These findings are consistent with and add to the literature that frontoparietal and default networks are important regions for change in neurodevelopment {[}TOCITE{]}. In subcortical structures, high proportions of coupling associations with age seen in the caudate, pallidum, hippocampus, and thalamus suggest modulation of vascular, resting state activation, and connectivity coupling may be necessary in the development of movement, memory, and fundamental brain activities.
+Spin testing showed that the high proportion of coupling-age associations in the frontoparietal and default networks were enriched when compared to the cortex overall. This suggests that in neurodevelopment, there is change in not only blood flow, resting state fluctuations, and local connectivity individually, but also in the strength of interaction among these features. These findings are consistent with and fortify the literature demonstrating the importance of frontoparietal and default networks as regions for change in neurodevelopment (\protect\hyperlink{ref-ballerDevelopmentalCouplingCerebral2021}{Baller et al., 2021}; \protect\hyperlink{ref-chaiEvolutionBrainNetwork2017}{Chai et al., 2017}; \protect\hyperlink{ref-fairMaturingArchitectureBrain2008}{Fair et al., 2008}; \protect\hyperlink{ref-linDevelopmentFrontoparietalConnectivity2019}{Lin et al., 2019}). Outside of neurodevelopment, our findings are consistent with previous work showing that coupling between CBF and functional connectivity strength is stronger in frontoparietal and default networks than regions outside these networks (\protect\hyperlink{ref-takAssociationsRestingStateFMRI2015}{Tak et al., 2015}). In subcortical structures, high proportions of coupling associations with age seen in the caudate, pallidum, hippocampus, and thalamus suggest that modulation of vascular, resting state fluctuations, and local connectivity coupling may be necessary in the development of movement, memory, and fundamental brain activities.
 
-High proportions of coupling associations with sex in the hippocampus and thalamus suggest differences in memory and fundamental brain activities between males and females could be explained in part by the strength of vascular organization, resting state activation, and connectivity coupling. The rarity of coupling-sex associations throughout the cortex suggest this coupling may not play a role in explaining sex-based differences in higher-order processing.
+High proportions of coupling associations with sex in the hippocampus and thalamus suggest that male-female differences in memory and related cognitive functions between males and females could be explained in part by the strength of regional brain metabolism as measured by cerebral blood flow, resting state fluctuations, and local connectivity coupling. In the cortex, the rarity of coupling-sex associations suggests that this coupling may not play a role in explaining cortical sex-based differences or that this relationship is more complex than our analyses could uncover. These cortical findings are of interest when compared to previous work showing a high proportion of the cortex had significant associations between sex and CBF-ALFF coupling (\protect\hyperlink{ref-ballerDevelopmentalCouplingCerebral2021}{Baller et al., 2021}). Together, these studies demonstrate that three-modality coupling identifies unique relationships when compared to two-modality coupling.
 
-Interestingly, despite low coupling-sex signal in the frontoparietal network, spin testing showed enrichment of coupling associations with sex in this network - since spin testing is a spatial permutation test which uses the sex-coupling association thresholded p-value map to generate data under the null, this is likely due to a combination of overall rare such associations in the cortex and the particular spatial distribution of these associations within the frontoparietal network. This finding highlights potential shortcomings of using the spin test for enrichment analysis. Additionally, statistical analysis of enrichment in subcortical structures is not yet possible. More methods development is needed in this area.
+Notably, despite low coupling-sex signal in the frontoparietal network, spin testing showed enrichment of coupling associations with sex in this network. Since spin testing is a spatial permutation test that uses the coupling-sex association thresholded p-value map to generate data under the null, this significant finding is likely due to a combination of overall rare coupling-sex associations in the cortex and the particular spatial distribution of these associations within the frontoparietal network. This finding highlights potential shortcomings of using the spin test for enrichment analysis. Additionally, statistical analysis of enrichment in subcortical structures is not yet possible, so more methods development is needed in this area.
 
-\hypertarget{limitations}{%
-\subsection{Limitations}\label{limitations}}
+\hypertarget{limitations-and-future-directions}{%
+\subsection{Limitations and Future Directions}\label{limitations-and-future-directions}}
 
-PCA-based IMCo is designed to summarize a complex local covariance structure as one value to allow for easy analysis and data reduction. While this property is a main strength of the method, it leads to outputs that can be challenging to interpret, and these outputs cannot fully characterize the intricacies of coupling. This is especially true in settings with more than two modalities, as the covariance structure becomes even more complex and biological interpretation of coupling between many modalities can be non-intuitive.
+pIMCo is designed to summarize a complex local covariance structure, which necessarily leads to outputs that cannot fully characterize the intricacies of coupling. This is especially true in settings with more than two modalities -- the covariance structure becomes even more complex and more information is lost when it is summarized. As such, high coupling values can result from many different covariance features, and it is challenging to understand the basis of these high values.
 
-The symmetric nature of PCA-based IMCo is conducive to more consistent interpretation when compared to slope-based IMCo. However, while slope is an intuitive measure that can be interpreted as capturing the effect size of a relationship, the generalizable nature of our PCA-based coupling value makes it challenging to interpret biologically. Instead, it is most accurately interpreted in statistical terms - as a measure of the proportion of variance explained by the first eigenvector, or as a measure of how well the local covariance structure can be summarized by the first eigenvector. Here, we chose to interpret neighborhoods whose covariance structures could be well-summarized as ones that are strongly coupled.
+The symmetric nature of pIMCo is conducive to more consistent interpretation when compared to slope-based IMCo, since pIMCo does not depend on reference modality specification. However, while slope is an biologically intuitive measure that can be interpreted as capturing the directionality and effect size of a relationship, the generalizable nature of the pIMCo value makes it challenging to interpret biologically, especially when used on more than two modalities. Instead, it is most accurately interpreted in statistical terms -- as a measure of the proportion of variance explained by the first eigenvector, as a measure of how well the local covariance structure could be summarized in one dimension, or as a measure of how ellipsoidal the neighborhood is instead of spherical. This is shown in Figure \ref{fig:wlrpca}, where the WLR coupling value estimates that, on average, a 1 unit increase in CBF corresponds to a 1.25 unit increase in ALFF, while the pIMCo coupling value describes the ratio of the ellipse's major axis to minor axis and suggests the statistical strength of the relationship between ALFF and CBF is strong.
 
-This interpretation of PCA-based coupling highlights that in two-modality settings it cannot describe biological directionality of coupling - whether local increases in one modality lead, on average, to increases or decreases in the other modality. In more than two modalities, pairwise directionality is not described. Instead, it can only describe the strength of the coupling relationship. However, this can also be seen as an improvement over slope-based IMCo - with PCA-based IMCo, larger values uniformly correspond to stronger coupling, while with slope-based IMCo, more positive or more negative values both correspond to stronger coupling.
+Next, since PCA functions as a linear dimension reduction technique, it is most effective at summarizing data whose shape is roughly ellipsoid. However, it is unlikely that such an assumption holds for all voxels and all combinations of different modalities. For example, in a two-dimensional neighborhood, it could be possible that there is a strong quadratic relationship between modalities, but the data is not well-summarized by one eigenvalue and its corresponding eigenvector. In such cases, an IMCo technique based on manifold learning concepts could be a useful improvement that picks up on otherwise undetected intermodal relationships.
 
-Finally, though PCA-based coupling does not require specification of an arbitrary reference modality to calculate coupling values, it is still subject to other run-time choices, such as FWHM value or application of masks.
-
-\hypertarget{future-directions}{%
-\subsection{Future directions}\label{future-directions}}
-
-In this study, we applied PCA-based IMCo to study coupling between features derived from pcASL and rfMRI modalities, but it can be applied in any study where interactions between multiple modalities are of interest. For example, Shokri-Kojori et al.~showed correspondence between cerebral glucose metabolism and fluctuations in blood oxygenation differed between brain networks in healthy patients and was also sensitive to differences related to acute or chronic alcohol use \citep{shokri-kojoriCorrespondenceCerebralGlucose2019}. However, these correspondence analyses were performed regionally or globally - voxel-wise IMCo analyses could reveal further insights.
-
-In the context of neurodegenerative disorders, it is well-known that Alzheimer's disease is characterized by changes in structural and functional MRI as well as in amyloid-tau positron emission tomography (PET) \citep{frisoniClinicalUseStructural2010, rowleyAmyloidTauPET2020, sperlingPotentialFunctionalMRI2011}. Numerous studies have been done to characterize Alzheimer's-related changes in these individual modalities as well as on interactions between these modalities \citep{bucknerMolecularStructuralFunctional2005, hasaniSystematicReviewAssociation2021, renApplicationStructuralFunctional2020, walesEffectsAmyloidTau2021}. In this setting, PCA-based IMCo could provide voxel-level resolution in pairwise comparisons as well as in all three modalities together. This could be useful as a data reduction tool to simplify complex covariance structures for descriptive analyses as well as a data augmentation tool for predictive efforts.
+Finally, pIMCo is designed to estimate coupling in cross-sectional multi-modality datasets. However, there is also rich covariance information in longitudinal datasets with one or multiple modalities. Future implementations of pIMCo suitable for longitudinal data could investigate whether IMCo changes over time in neurodevelopment or disease, and if so, whether such changes may be useful in identifying biomarkers for clinical phenotypes.
 
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
 
-PCA-based IMCo offers a generalized approach for describing coupling between two modalities and a novel perspective for summarizing the overall covariance structure between more than two modalities. Here, we applied this method to the analysis of coupling between cerebral blood flow, resting state activations, and local connectivity maps. This analysis revealed patterns in neurodevelopment with respect to age and sex that were unique to those present in any individual modality. As multi-modal data becomes more common, we hope that PCA-based IMCo will serve as a tool for capturing complex intermodal relationships and allow for additional descriptive analyses, improved prediction efforts, and novel methodological advances, among others.
+pIMCo offers a novel perspective for summarizing the overall covariance structure between more than two modalities as well as a generalized, symmetric approach for describing coupling in the two-modality setting. Here, we applied this method to the analysis of coupling between cerebral blood flow, resting state fluctuations, and local connectivity images. This analysis revealed patterns in neurodevelopment with respect to age and sex that differed from those present in any individual modality. As multi-modal data becomes more common, we hope that pIMCo will serve as a tool for capturing complex intermodal relationships and enable more sophisticated descriptive analyses, improved prediction efforts, and novel methodological advances, among others.
 
 \hypertarget{acknowledgements}{%
-\section{Acknowledgements}\label{acknowledgements}}
+\section*{Acknowledgements}\label{acknowledgements}}
+\addcontentsline{toc}{section}{Acknowledgements}
 
-This study was supported by grants from the National Institute of Mental Health (R01MH112847 to TDS and RTS; R01MH120482 and R01MH113550 to TDS; R01 MH123550-01 to RTS; R01MH107235 to RCG; 2T32MH019112-29A1 to EBB; R01MH120174, R01MH119185, and R56AG066656 to DRR). The PNC data used was funded by NIMH RC2 grants (MH089983 and MH089924 to REG).
+This study was supported by grants from the National Institute of Mental Health (R01MH112847 to TDS and RTS; R01MH120482 and R01MH113550 to TDS; R01 MH123550-01 to RTS; R01MH107235 to RCG; 2T32MH019112-29A1 to EBB; R01MH120174, R01MH119185, and R56AG066656 to DRR). FH was supported by NIH Medical Scientist Training Program T32 GM07170. SMW was supported by the National Science Foundation Graduate Research Fellowship Program (NSF GRFP). The PNC data used was funded by NIMH RC2 grants (MH089983 and MH089924 to REG). Funding sources were not involved in study design, data analysis, manuscript preparation, or submission decisions.
+
+\hypertarget{disclosures-and-declaration-of-interest}{%
+\section*{Disclosures and declaration of interest}\label{disclosures-and-declaration-of-interest}}
+\addcontentsline{toc}{section}{Disclosures and declaration of interest}
+
+RTS receives consulting income from Octave Bioscience and compensation for reviewership duties from the American Medical Association. The authors report no conflicts of interest.
+
+\newpage
 
 \hypertarget{references}{%
-\section{References}\label{references}}
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\begin{CSLReferences}{0}{0}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-alexander-bloch_testing_2018}{}}%
+Alexander-Bloch, A.F., Shou, H., Liu, S., Satterthwaite, T.D., Glahn, D.C., Shinohara, R.T., Vandekar, S.N., Raznahan, A., 2018. On testing for spatial correspondence between maps of human brain structure and function. NeuroImage 178, 540--551. \url{https://doi.org/10.1016/j.neuroimage.2018.05.070}
+
+\leavevmode\vadjust pre{\hypertarget{ref-R-rmarkdown}{}}%
+Allaire, J., Xie, Y., McPherson, J., Luraschi, J., Ushey, K., Atkins, A., Wickham, H., Cheng, J., Chang, W., Iannone, R., 2021. \href{https://CRAN.R-project.org/package=rmarkdown}{Rmarkdown: Dynamic documents for r}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-antsr}{}}%
+Avants, B.B., 2020. ANTsR: ANTs in r: Quantification tools for biomedical images.
+
+\leavevmode\vadjust pre{\hypertarget{ref-avantsReproducibleEvaluationANTs2011}{}}%
+Avants, B.B., Tustison, N.J., Song, G., Cook, P.A., Klein, A., Gee, J.C., 2011. A reproducible evaluation of {ANTs} similarity metric performance in brain image registration. NeuroImage 54, 2033--2044. \url{https://doi.org/10.1016/j.neuroimage.2010.09.025}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ballerDevelopmentalCouplingCerebral2021}{}}%
+Baller, E.B., Valcarcel, A.M., Adebimpe, A., Alexander-Bloch, A., Cui, Z., Gur, R.C., Gur, R.E., Larsen, B.L., Linn, K.A., O'NADonnell, C.M., Pines, A.R., Raznahan, A., Roalf, D.R., Sydnor, V.J., Tapera, T.M., Tisdall, M.D., Vandekar, S., Xia, C.H., Detre, J.A., Shinohara, R.T., Satterthwait, T.D., 2021. Developmental coupling of cerebral blood flow and {fMRI} fluctuations in youth. bioRxiv. \url{https://doi.org/10.1101/2021.07.28.454179}
+
+\leavevmode\vadjust pre{\hypertarget{ref-benjaminiControllingFalseDiscovery1995}{}}%
+Benjamini, Y., Hochberg, Y., 1995. \href{https://www.jstor.org/stable/2346101}{Controlling the {False Discovery Rate}: {A Practical} and {Powerful Approach} to {Multiple Testing}}. Journal of the Royal Statistical Society. Series B (Methodological) 57, 289--300.
+
+\leavevmode\vadjust pre{\hypertarget{ref-chaiEvolutionBrainNetwork2017}{}}%
+Chai, L.R., Khambhati, A.N., Ciric, R., Moore, T.M., Gur, R.C., Gur, R.E., Satterthwaite, T.D., Bassett, D.S., 2017. Evolution of brain network dynamics in neurodevelopment. Network Neuroscience 1, 14--30. \url{https://doi.org/10.1162/NETN_a_00001}
+
+\leavevmode\vadjust pre{\hypertarget{ref-chappell_partial_2011}{}}%
+Chappell, M.A., Groves, A.R., MacIntosh, B.J., Donahue, M.J., Jezzard, P., Woolrich, M.W., 2011. Partial volume correction of multiple inversion time arterial spin labeling {MRI} data. Magnetic Resonance in Medicine 65, 1173--1183. \url{https://doi.org/10.1002/mrm.22641}
+
+\leavevmode\vadjust pre{\hypertarget{ref-chappell_variational_2009}{}}%
+Chappell, M.A., Groves, A.R., Whitcher, B., Woolrich, M.W., 2009. Variational {Bayesian} {Inference} for a {Nonlinear} {Forward} {Model}. IEEE Transactions on Signal Processing 57, 223--236. \url{https://doi.org/10.1109/TSP.2008.2005752}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ciricMitigatingHeadMotion2018}{}}%
+Ciric, R., Rosen, A.F., Erus, G., Cook, P.A., Bassett, D.S., Davatzikos, C., Wolf, D.H., Satterthwaite, T.D., 2018. Mitigating head motion artefact in functional connectivity {MRI}. Nat Protoc 13, 2801--2826. \url{https://doi.org/10.1038/s41596-018-0065-y}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ciricTemplateFlowFAIRsharingMultiscale2021}{}}%
+Ciric, R., Thompson, W.H., Lorenz, R., Goncalves, M., MacNicol, E., Markiewicz, C.J., Halchenko, Y.O., Ghosh, S.S., Gorgolewski, K.J., Poldrack, R.A., Esteban, O., 2021. {TemplateFlow}: {FAIR-sharing} of multi-scale, multi-species brain models 2021.02.10.430678. \url{https://doi.org/10.1101/2021.02.10.430678}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ciricBenchmarkingParticipantlevelConfound2017}{}}%
+Ciric, R., Wolf, D.H., Power, J.D., Roalf, D.R., Baum, G.L., Ruparel, K., Shinohara, R.T., Elliott, M.A., Eickhoff, S.B., Davatzikos, C., Gur, R.C., Gur, R.E., Bassett, D.S., Satterthwaite, T.D., 2017. Benchmarking of participant-level confound regression strategies for the control of motion artifact in studies of functional connectivity. NeuroImage, Cleaning up the {fMRI} time series: {Mitigating} noise with advanced acquisition and correction strategies 154, 174--187. \url{https://doi.org/10.1016/j.neuroimage.2017.03.020}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cox1996afni}{}}%
+Cox, R.W., 1996. AFNI: Software for analysis and visualization of functional magnetic resonance neuroimages. Computers and Biomedical research 29, 162--173.
+
+\leavevmode\vadjust pre{\hypertarget{ref-desikanAutomatedLabelingSystem2006a}{}}%
+Desikan, R.S., S'egonne, F., Fischl, B., Quinn, B.T., Dickerson, B.C., Blacker, D., Buckner, R.L., Dale, A.M., Maguire, R.P., Hyman, B.T., Albert, M.S., Killiany, R.J., 2006. An automated labeling system for subdividing the human cerebral cortex on {MRI} scans into gyral based regions of interest. Neuroimage 31, 968--980. \url{https://doi.org/10.1016/j.neuroimage.2006.01.021}
+
+\leavevmode\vadjust pre{\hypertarget{ref-fairMaturingArchitectureBrain2008}{}}%
+Fair, D.A., Cohen, A.L., Dosenbach, N.U.F., Church, J.A., Miezin, F.M., Barch, D.M., Raichle, M.E., Petersen, S.E., Schlaggar, B.L., 2008. The maturing architecture of the brain's default network. PNAS 105, 4028--4032. \url{https://doi.org/10.1073/pnas.0800376105}
+
+\leavevmode\vadjust pre{\hypertarget{ref-fischl2012freesurfer}{}}%
+Fischl, B., 2012. FreeSurfer. Neuroimage 62, 774--781.
+
+\leavevmode\vadjust pre{\hypertarget{ref-greveAccurateRobustBrain2009}{}}%
+Greve, D.N., Fischl, B., 2009. Accurate and robust brain image alignment using boundary-based registration. NeuroImage 48, 63--72. \url{https://doi.org/10.1016/j.neuroimage.2009.06.060}
+
+\leavevmode\vadjust pre{\hypertarget{ref-guHeritabilityInterindividualVariability2021}{}}%
+Gu, Z., Jamison, K.W., Sabuncu, M.R., Kuceyeski, A., 2021. Heritability and interindividual variability of regional structure-function coupling. Nat Commun 12, 4894. \url{https://doi.org/10.1038/s41467-021-25184-4}
+
+\leavevmode\vadjust pre{\hypertarget{ref-gurStructuralFunctionalBrain2020}{}}%
+Gur, R.C., Butler, E.R., Moore, T.M., Rosen, A.F.G., Ruparel, K., Satterthwaite, T.D., Roalf, D.R., Gennatas, E.D., Bilker, W.B., Shinohara, R.T., Port, A., Elliott, M.A., Verma, R., Davatzikos, C., Wolf, D.H., Detre, J.A., Gur, R.E., 2020. Structural and {Functional Brain Parameters Related} to {Cognitive Performance Across Development}: {Replication} and {Extension} of the {Parieto-Frontal Integration Theory} in a {Single Sample}. Cereb Cortex 31, 1444--1463. \url{https://doi.org/10.1093/cercor/bhaa282}
+
+\leavevmode\vadjust pre{\hypertarget{ref-honeyPredictingHumanRestingstate2009}{}}%
+Honey, C.J., Sporns, O., Cammoun, L., Gigandet, X., Thiran, J.P., Meuli, R., Hagmann, P., 2009. Predicting human resting-state functional connectivity from structural connectivity. PNAS 106, 2035--2040. \url{https://doi.org/10.1073/pnas.0811168106}
+
+\leavevmode\vadjust pre{\hypertarget{ref-jenkinson2012fsl}{}}%
+Jenkinson, M., Beckmann, C.F., Behrens, T.E., Woolrich, M.W., Smith, S.M., 2012. FSL. Neuroimage 62, 782--790.
+
+\leavevmode\vadjust pre{\hypertarget{ref-antsrcore}{}}%
+Kandel, B.M., Cook, P.A., Tustison, N.J., Muschelli, J., 2020. ANTsRCore: Core software infrastructure for 'ANTsR'.
+
+\leavevmode\vadjust pre{\hypertarget{ref-linDevelopmentFrontoparietalConnectivity2019}{}}%
+Lin, H.-Y., Perry, A., Cocchi, L., Roberts, J.A., Tseng, W.-Y.I., Breakspear, M., Gau, S.S.-F., 2019. Development of frontoparietal connectivity predicts longitudinal symptom changes in young people with autism spectrum disorder. Transl Psychiatry 9, 1--10. \url{https://doi.org/10.1038/s41398-019-0418-5}
+
+\leavevmode\vadjust pre{\hypertarget{ref-here}{}}%
+Müller, K., 2020. \href{https://CRAN.R-project.org/package=here}{Here: A simpler way to find your files}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-extrantsr}{}}%
+Muschelli, J., 2021a. Extrantsr: Extra functions to build on the 'ANTsR' package.
+
+\leavevmode\vadjust pre{\hypertarget{ref-neurobase}{}}%
+Muschelli, J., 2021b. Neurobase: 'Neuroconductor' base package with helper functions for 'nifti' objects.
+
+\leavevmode\vadjust pre{\hypertarget{ref-muschelli2015fslr}{}}%
+Muschelli, J., Sweeney, E., Lindquist, M., Crainiceanu, C., 2015. Fslr: Connecting the FSL software with r. The R Journal 7, 163--175.
+
+\leavevmode\vadjust pre{\hypertarget{ref-R-base}{}}%
+R Core Team, 2021. \href{https://www.R-project.org/}{R: A language and environment for statistical computing}. R Foundation for Statistical Computing, Vienna, Austria.
+
+\leavevmode\vadjust pre{\hypertarget{ref-rlist}{}}%
+Ren, K., 2021. \href{https://CRAN.R-project.org/package=rlist}{Rlist: A toolbox for non-tabular data manipulation}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-satterthwaite_neuroimaging_2014}{}}%
+Satterthwaite, T.D., Elliott, M.A., Ruparel, K., Loughead, J., Prabhakaran, K., Calkins, M.E., Hopson, R., Jackson, C., Keefe, J., Riley, M., Mensh, F.D., Sleiman, P., Verma, R., Davatzikos, C., Hakonarson, H., Gur, R.C., Gur, R.E., 2014. Neuroimaging of the {Philadelphia} {Neurodevelopmental} {Cohort}. NeuroImage 86, 544--553. \url{https://doi.org/10.1016/j.neuroimage.2013.07.064}
+
+\leavevmode\vadjust pre{\hypertarget{ref-fsformats}{}}%
+Schäfer, T., 2021. \href{https://CRAN.R-project.org/package=freesurferformats}{Freesurferformats: Read and write 'FreeSurfer' neuroimaging file formats}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-shokri-kojoriCorrespondenceCerebralGlucose2019}{}}%
+Shokri-Kojori, E., Tomasi, D., Alipanahi, B., Wiers, C.E., Wang, G.-J., Volkow, N.D., 2019. Correspondence between cerebral glucose metabolism and {BOLD} reveals relative power and cost in human brain. Nat Commun 10, 690. \url{https://doi.org/10.1038/s41467-019-08546-x}
+
+\leavevmode\vadjust pre{\hypertarget{ref-takAssociationsRestingStateFMRI2015}{}}%
+Tak, S., Polimeni, J.R., Wang, D.J.J., Yan, L., Chen, J.J., 2015. Associations of {Resting-State fMRI Functional Connectivity} with {Flow-BOLD Coupling} and {Regional Vasculature}. Brain Connect 5, 137--146. \url{https://doi.org/10.1089/brain.2014.0299}
+
+\leavevmode\vadjust pre{\hypertarget{ref-thomasyeoOrganizationHumanCerebral2011}{}}%
+Thomas Yeo, B.T., Krienen, F.M., Sepulcre, J., Sabuncu, M.R., Lashkari, D., Hollinshead, M., Roffman, J.L., Smoller, J.W., Zöllei, L., Polimeni, J.R., Fischl, B., Liu, H., Buckner, R.L., 2011. The organization of the human cerebral cortex estimated by intrinsic functional connectivity. J Neurophysiol 106, 1125--1165. \url{https://doi.org/10.1152/jn.00338.2011}
+
+\leavevmode\vadjust pre{\hypertarget{ref-tustisonLargescaleEvaluationANTs2014}{}}%
+Tustison, N.J., Cook, P.A., Klein, A., Song, G., Das, S.R., Duda, J.T., Kandel, B.M., van Strien, N., Stone, J.R., Gee, J.C., Avants, B.B., 2014. Large-scale evaluation of {ANTs} and {FreeSurfer} cortical thickness measurements. NeuroImage 99, 166--179. \url{https://doi.org/10.1016/j.neuroimage.2014.05.044}
+
+\leavevmode\vadjust pre{\hypertarget{ref-tzourio-mazoyerAutomatedAnatomicalLabeling2002}{}}%
+Tzourio-Mazoyer, N., Landeau, B., Papathanassiou, D., Crivello, F., Etard, O., Delcroix, N., Mazoyer, B., Joliot, M., 2002. Automated anatomical labeling of activations in {SPM} using a macroscopic anatomical parcellation of the {MNI MRI} single-subject brain. Neuroimage 15, 273--289. \url{https://doi.org/10.1006/nimg.2001.0978}
+
+\leavevmode\vadjust pre{\hypertarget{ref-uddinComplexRelationshipsStructural2013}{}}%
+Uddin, L.Q., 2013. Complex relationships between structural and functional brain connectivity. Trends in Cognitive Sciences, Special {Issue}: {The Connectome} 17, 600--602. \url{https://doi.org/10.1016/j.tics.2013.09.011}
+
+\leavevmode\vadjust pre{\hypertarget{ref-valcarcelDualModelingApproach2018}{}}%
+Valcarcel, A.M., Linn, K.A., Khalid, F., Vandekar, S.N., Tauhid, S., Satterthwaite, T.D., Muschelli, J., Martin, M.L., Bakshi, R., Shinohara, R.T., 2018a. A dual modeling approach to automatic segmentation of cerebral {T2} hyperintensities and {T1} black holes in multiple sclerosis. NeuroImage: Clinical 20, 1211--1221. \url{https://doi.org/10.1016/j.nicl.2018.10.013}
+
+\leavevmode\vadjust pre{\hypertarget{ref-valcarcelMIMoSAAutomatedMethod2018}{}}%
+Valcarcel, A.M., Linn, K.A., Vandekar, S.N., Satterthwaite, T.D., Muschelli, J., Calabresi, P.A., Pham, D.L., Martin, M.L., Shinohara, R.T., 2018b. {MIMoSA}: {An Automated Method} for {Intermodal Segmentation Analysis} of {Multiple Sclerosis Brain Lesions}. J Neuroimaging 28, 389--398. \url{https://doi.org/10.1111/jon.12506}
+
+\leavevmode\vadjust pre{\hypertarget{ref-vandekarSubjectlevelMeasurementLocal2016}{}}%
+Vandekar, S.N., Shinohara, R.T., Raznahan, A., Hopson, R.D., Roalf, D.R., Ruparel, K., Gur, R.C., Gur, R.E., Satterthwaite, T.D., 2016. Subject-level {Measurement} of {Local Cortical Coupling}. Neuroimage 133, 88--97. \url{https://doi.org/10.1016/j.neuroimage.2016.03.002}
+
+\leavevmode\vadjust pre{\hypertarget{ref-pysurfer}{}}%
+Waskom, M., Gramfort, A., Burns, S., Luessi, M., Larson, E., 2020. \href{https://pysurfer.github.io/index.html}{PySurfer}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-stringr}{}}%
+Wickham, H., 2019. \href{https://CRAN.R-project.org/package=stringr}{Stringr: Simple, consistent wrappers for common string operations}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-tidyverse}{}}%
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L.D., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T.L., Miller, E., Bache, S.M., Müller, K., Ooms, J., Robinson, D., Seidel, D.P., Spinu, V., Takahashi, K., Vaughan, D., Wilke, C., Woo, K., Yutani, H., 2019. Welcome to the {tidyverse}. Journal of Open Source Software 4, 1686. \url{https://doi.org/10.21105/joss.01686}
+
+\leavevmode\vadjust pre{\hypertarget{ref-R-bookdown}{}}%
+Xie, Y., 2021a. \href{https://CRAN.R-project.org/package=bookdown}{Bookdown: Authoring books and technical documents with r markdown}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-R-knitr}{}}%
+Xie, Y., 2021b. \href{https://yihui.org/knitr/}{Knitr: A general-purpose package for dynamic report generation in r}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-bookdown2016}{}}%
+Xie, Y., 2016. \href{https://bookdown.org/yihui/bookdown}{Bookdown: Authoring books and technical documents with {R} markdown}. Chapman; Hall/CRC, Boca Raton, Florida.
+
+\leavevmode\vadjust pre{\hypertarget{ref-yangAmplitudeLowFrequency2007}{}}%
+Yang, H., Long, X.-Y., Yang, Y., Yan, H., Zhu, C.-Z., Zhou, X.-P., Zang, Y.-F., Gong, Q.-Y., 2007. Amplitude of low frequency fluctuation within visual areas revealed by resting-state functional {MRI}. Neuroimage 36, 144--152. \url{https://doi.org/10.1016/j.neuroimage.2007.01.054}
+
+\leavevmode\vadjust pre{\hypertarget{ref-py06nimg}{}}%
+Yushkevich, P.A., Piven, J., Cody Hazlett, H., Gimpel Smith, R., Ho, S., Gee, J.C., Gerig, G., 2006. User-guided {3D} active contour segmentation of anatomical structures: Significantly improved efficiency and reliability. Neuroimage 31, 1116--1128.
+
+\leavevmode\vadjust pre{\hypertarget{ref-zangRegionalHomogeneityApproach2004}{}}%
+Zang, Y., Jiang, T., Lu, Y., He, Y., Tian, L., 2004. Regional homogeneity approach to {fMRI} data analysis. Neuroimage 22, 394--400. \url{https://doi.org/10.1016/j.neuroimage.2003.12.030}
+
 \end{CSLReferences}
 
-\hypertarget{appendix-supplementary-materials}{%
-\appendix}
+\newpage
 
+\hypertarget{supplementary-materials}{%
+\section{Supplementary Materials}\label{supplementary-materials}}
 
-  \bibliography{ref.bib,references.bib,packages.bib}
+\begin{figure}
+\includegraphics[width=205.96in]{figures/supplement-01} \caption{A) Voxel-wise means across subjects of cortical CBF. B) Voxel-wise variances across subjects of cortical CBF. C) Voxel-wise means across subjects of cortical ALFF. D) Voxel-wise variances across subjects of cortical ALFF. E) Voxel-wise means across subjects of cortical ReHo. F) Voxel-wise variances across subjects of cortical ReHo.}\label{fig:supplement}
+\end{figure}
 
 \end{document}

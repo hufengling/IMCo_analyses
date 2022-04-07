@@ -2,13 +2,13 @@
 title: "Voxel-wise Intermodal Coupling Analysis of Two or More Modalities using Local Covariance Decomposition"
 author:
   - Fengling Hu:
-      email: fengling.hu@pennmedicine.upenn.edu
+      email: fengling.hu@pennmedicine.upenn.edu; 423 Guardian Dr, Philadelphia, PA 19104
       institute: pennsive
       correspondence: true
   - name: Sarah M. Weinstein
     institute: pennsive
   - name: Erica B. Baller
-    institute: pennlinc
+    institute: [psych, pennlinc]
   - name: Alessandra M. Valcarcel
     institute: pennsive
   - name: Azeez Adebimpe
@@ -17,7 +17,7 @@ author:
     institute: nimh
   - name: David R. Roalf
     institute: psych
-  - name: Tim Robert-Fitzgerald
+  - name: Timothy E. Robert-Fitzgerald
     institute: pennsive
   - name: Virgilio Gonzenbach
     institute: pennsive
@@ -39,34 +39,22 @@ author:
     institute: [pennsive, cbica]
 institute:
   - pennsive: Penn Statistics in Imaging and Visualization Endeavor (PennSIVE), Department of Biostatistics, Epidemiology, and Informatics, Perelman School of Medicine, University of Pennsylvania
-  - cbica: Center for Biomedical Image Computing and Analytics (CBICA), Perelman School of Medicine
   - psych: Department of Psychiatry, Perelman School of Medicine, University of Pennsylvania
   - pennlinc: The Penn Lifespan Informatics and Neuroimaging Center, Department of Psychiatry, Perelman School of Medicine, University of Pennsylvania
-  - rad: Department of Radiology, Perelman School of Medicine, University of Pennsylvania
-  - vetadmin: Philadelphia Veterans Administration Medical Center
-  - neuro: Department of Neurology, Perelman School of Medicine, University of Pennsylvania
   - nimh: National Institute of Mental Health, Intramural Research Program, National Institute of Health
+  - rad: Department of Radiology, Perelman School of Medicine, University of Pennsylvania
+  - neuro: Department of Neurology, Perelman School of Medicine, University of Pennsylvania
   - vandybiostats: Department of Biostatistics, Vanderbilt University
-#  - genentech: Genentech Inc.
+  - cbica: Center for Biomedical Image Computing and Analytics (CBICA), Perelman School of Medicine
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 site: bookdown::bookdown_site
 output:
   bookdown::word_document2:
     fig_caption: yes
+    number_sections: yes
+    global_numbering: yes
     md_extensions: +footnotes
     reference_docx: /Users/hufengling/Documents/Penn/Shinohara/bookdown_refs/word_style_reference.docx
-    pandoc_args:
-      - '--lua-filter=scholarly-metadata.lua'
-      - '--lua-filter=author-info-blocks.lua'
-    toc: no
-  bookdown::pdf_document2:
-    base_format: rticles::elsevier_article()
-    includes:
-      before_body: doc_prefix.tex
-      in_header: preamble.tex
-    keep_tex: yes
-    latex_engine: xelatex
-    number_sections: no
     pandoc_args:
       - '--lua-filter=scholarly-metadata.lua'
       - '--lua-filter=author-info-blocks.lua'
@@ -75,17 +63,13 @@ bibliography: [ref.bib, references.bib, packages.bib]
 fontsize: 12pt
 link-citations: yes
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/elsevier-harvard.csl
-nocite: |
-  @R-base, @stringr, @R-bookdown, @R-knitr, @R-rmarkdown, @bookdown2016, @tidyverse, @extrantsr, @antsr, @antsrcore, @here, @fischl2012freesurfer, @fsformats, @jenkinson2012fsl, @muschelli2015fslr, @rlist, @neurobase, @py06nimg
 ---
 
-# CRediT author statement
-Fengling Hu: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing -- Original Draft, Writing - Review & Editing, Visualization
-
-TODO
-
-https://www.elsevier.com/authors/policies-and-guidelines/credit-author-statement
+# CRediT author statement {-}
+**Fengling Hu:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing -- Original Draft, Writing -- Review & Editing, Visualization. **Sarah M. Weinstein:** Methodology, Software, Formal analysis, Investigation, Writing -- Review & Editing. **Erica B. Baller:** Investigation, Resources, Writing -- Review & Editing. **Alessandra M. Valcarcel:** Conceptualization, Methodology, Software, Investigation. **Azeez Adebimpe:** Software, Investigation, Resources, Data Curation. **Armin Raznahan:** Conceptualization, Writing -- Review & Editing. **David R. Roalf:** Conceptualization, Writing -- Review & Editing. **Timothy E. Robert-Fitzgerald:** Methodology, Software, Data Curation, Visualization. **Virgilio Gonzenbach:** Methodology, Software, Visualization. **Ruben C. Gur:** Conceptualization, Investigation, Resources, Funding acquisition. **Raquel E. Gur:** Conceptualization, Investigation, Resources, Funding acquisition. **Simon Vandekar:** Conceptualization, Software, Formal analysis, Investigation, Writing -- Review & Editing. **John A. Detre:** Conceptualization, Writing -- Review & Editing. **Kristin A. Linn:** Conceptualization, Software, Formal analysis, Investigation, Writing -- Review & Editing, Funding acquisition. **Aaron Alexander-Bloch:** Methodology, Software, Formal analysis, Investigation, Resources. **Theodore D. Satterthwaite:** Conceptualization, Validation, Investigation, Resources, Data Curation, Writing -- Review & Editing, Supervision, Project administration, Funding acquisition. **Russell T. Shinohara:** Conceptualization, Methodology, Validation, Investigation, Resources, Writing -- Review & Editing, Supervision, Project administration, Funding acquisition
 
 ```{r include = FALSE}
 knitr::opts_chunk$set(fig.width=5, fig.height=3.5, echo = FALSE, warning = FALSE, message = FALSE) 
 ```
+
+\newpage
