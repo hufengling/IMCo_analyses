@@ -1,0 +1,143 @@
+---
+title: "revisions"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggpubr)
+library(ggthemes)
+library(ggprism)
+library(ggforce)
+library(pIMCo)
+library(ANTsR)
+library(extrantsr)
+library(neurobase)
+library(tictoc)
+```
+
+## Start from load
+```{r}
+load(here("input/csvs/settings.RData"))
+input_filepaths <- read_csv(settings$input_filepaths_path)
+predictors <- read_csv(settings$predictors_path)
+coupling_age <- check_ants(here("output/niftis/pvals/adjusted/global_wcov_age_fdr05.nii.gz"))
+default_network <- check_ants(here("output/freesurfer_images/PNC_space/yeo7_regions/yeo7_7.nii.gz"))
+coupling_files <- list.files(here("output/niftis/coupled/global_wcov"), full.names = TRUE)
+input_filepaths <- cbind(input_filepaths, coupling_files)
+```
+
+```{r}
+get_weights <- function(offsets, voxel_dims, sigma) {
+  dists <- t(apply(offsets, 1, function(x, y) x * y, y = voxel_dims))
+  sqNorm <- apply(dists * dists, 1, function(x) sum(x))
+  # Constant doesn't matter because we would rescale by
+  # max weight so that center voxel would be be 1
+  return(exp(-1 * sqNorm / (2 * sigma^2)))
+}
+```
+
+```{r}
+set.seed(2022)
+random_subjects <- input_filepaths$subj_num[sample(1:803, 25)]
+
+mask <- check_ants(here("input/references/masks/gm10_pcals_rest.nii.gz"))
+out_dir <- here("output/figures/revision")
+fwhm <- 3 
+prop_miss <- 0.9
+sigma <- fwhm / 2.35482
+coord <- c(65, 100, 40)
+```
+
+```{r}
+tic()
+for (i in 1:length(random_subjects)) {
+  alff_ants <- check_ants(here(paste0("../input/niftis/alff/", random_subjects[i], "_alffStd.nii.gz"))) %>% 
+    zscore_img() %>% oro2ants()
+  cbf_ants <- check_ants(here(paste0("../input/niftis/cbf-basil/", random_subjects[i], "_basil.nii.gz"))) %>% 
+    zscore_img() %>% oro2ants()
+  reho_ants <- check_ants(here(paste0("../input/niftis/reho/", random_subjects[i], "_rehoStd.nii.gz"))) %>% 
+    zscore_img() %>% oro2ants()
+  
+  out_name <- random_subjects[i]
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  
+  imco(files = list(alff_ants, cbf_ants, reho_ants),
+       brain_mask = mask,
+       out_dir = out_dir,
+       out_name = out_name,
+       fwhm = fwhm,
+       prop_miss = prop_miss)
+}
+toc()
+```
+
+```{r}
+coupling_imgs <- check_ants(list.files(out_dir, full.names = T))
+
+img_num <- 0
+coupling_vals <- c()
+img_ids <- c()
+for (i in 1:length(coupling_imgs)) {
+  img <- coupling_imgs[[i]]
+  tmp_vals <- img[img != 0]
+  if (length(tmp_vals) != 102508) {
+    print(i)
+    stop("Length is wrong.")
+  }
+  
+  coupling_vals <- c(coupling_vals, tmp_vals)
+  img_ids <- c(img_ids, rep(i, 102508))
+}
+
+coupling_df <- data.frame(id = img_ids, coupling = coupling_vals)
+coupling_df$id <- as.factor(coupling_df$id)
+coupling_df <- coupling_df %>% mutate(ratio = (3 * exp(coupling) + 1) / (3 * exp(coupling) + 3))
+
+coupling_df_small <- coupling_df %>% filter(id %in% 1:5)
+```
+
+```{r}
+title_size <- 25
+axis_size <- 15
+xy_title_size <- 23
+line_size <- 2
+
+untransformed <- ggplot(coupling_df_small) + geom_density(aes(ratio, color = id, alpha = 0.5), size = line_size, alpha = 0.5) + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(coupling_df_small$ratio), 
+                            sd = sd(coupling_df_small$ratio)), size = line_size) +
+  xlim(.1, 1.2) +
+  labs(x = "Proportional first eigenvalue", y = "density") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); untransformed
+
+transformed <- ggplot(coupling_df_small) + geom_density(aes(coupling, color = id), size = line_size) + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(coupling_df_small$coupling), 
+                            sd = sd(coupling_df_small$coupling)), size = line_size) +
+  xlim(-3, 5) +
+  labs(x = "Coupling value", y = "density") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); transformed
+```
+
+```{r}
+coupling_transform <- ggarrange(untransformed, transformed, nrow = 1, ncol = 2); coupling_transform
+ggsave(filename = here("output/figures/revision/coupling_transform.png"), plot = coupling_transform, type = "cairo-png", width = 15.083, height = 6, dpi = 300)
+```
+
+

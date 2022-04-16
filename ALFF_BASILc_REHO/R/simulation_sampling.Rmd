@@ -1,0 +1,249 @@
+---
+title: "simulation_sampling"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggpubr)
+library(ggthemes)
+library(ggprism)
+library(ggforce)
+library(pIMCo)
+library(ANTsR)
+library(extrantsr)
+library(neurobase)
+library(corrplot)
+library(ggcorrplot)
+```
+
+## Start from load
+```{r}
+load(here("input/csvs/settings.RData"))
+input_filepaths <- read_csv(settings$input_filepaths_path)
+predictors <- read_csv(settings$predictors_path)
+```
+
+```{r}
+set.seed(2022)
+random_subjects <- input_filepaths$subj_num[sample(1:803, 100)]
+mask <- check_ants(here("input/references/masks/gm10_pcals_rest.nii.gz"))
+n_mask_inds <- 50
+out_dir <- here("output/figures/simulation")
+fwhm <- 3 
+prop_miss <- 0.9
+sigma <- fwhm / 2.35482
+
+get_weights <- function(offsets, voxel_dims, sigma) {
+  dists <- t(apply(offsets, 1, function(x, y) x * y, y = voxel_dims))
+  sqNorm <- apply(dists * dists, 1, function(x) sum(x))
+  # Constant doesn't matter because we would rescale by
+  # max weight so that center voxel would be be 1
+  return(exp(-1 * sqNorm / (2 * sigma^2)))
+}
+```
+
+# Calculate WLR vs PCA
+```{r}
+calculate_coefficients <- function(alff_cbf_df) {
+  lm_alff_cbf <- lm(alff ~ cbf, data = alff_cbf_df, weights = weights)$coefficients[2]
+  lm_cbf_alff <- lm(cbf ~ alff, data = alff_cbf_df, weights = weights)$coefficients[2]
+  
+  wt_cov <- with(alff_cbf_df, cov.wt(cbind(alff, cbf), wt = weights))$cov
+  eigen_val <- eigen(wt_cov)
+  coupling <- 2 * eigen_val$values[1]/(eigen_val$values[1] + eigen_val$values[2]) - 1; coupling
+  logit_coupling <- log(coupling) - log(1 - coupling)
+  
+  return(c(lm_alff_cbf, lm_cbf_alff, logit_coupling))
+}
+```
+
+```{r}
+i = 1
+
+output <- c()
+for (i in 1:length(random_subjects)) {
+  mask_inds <- which(mask == 1, arr.ind = TRUE)[sample(1:102508, n_mask_inds), ]
+  alff_ants <- check_ants(here(paste0("../input/niftis/alff/", random_subjects[i], "_alffStd.nii.gz"))) %>% 
+    zscore_img() %>% oro2ants()
+  cbf_ants <- check_ants(here(paste0("../input/niftis/cbf-basil/", random_subjects[i], "_basil.nii.gz"))) %>% 
+    zscore_img() %>% oro2ants()
+  
+  subj_output <- c()
+  for (j in 1:n_mask_inds) {
+    coord <- mask_inds[j, ] %>% as.numeric()
+    alff_nhood <- getNeighborhoodAtVoxel(alff_ants, coord, kernel = c(3, 3, 3))
+    cbf_nhood <- getNeighborhoodAtVoxel(cbf_ants, coord, kernel = c(3, 3, 3))
+    #reho_nhood <- getNeighborhoodAtVoxel(reho_ants, coord, kernel = c(3, 3, 3))$values
+    #coupling_nhood <- getNeighborhoodAtVoxel(coupling_ants, coord, kernel = c(3, 3, 3))
+    if (j == 1) {
+      offsets <- t(t(alff_nhood$indices) - coord)
+      weights <- get_weights(offsets, c(2, 2, 2), sigma)
+      weight_norm <- weights / sum(weights)
+    }
+    
+    alff_cbf_df <- data.frame(alff = alff_nhood$values, cbf = cbf_nhood$values, weights = weight_norm)
+    subj_output <- c(subj_output, calculate_coefficients(alff_cbf_df))
+  }
+  output <- c(output, subj_output)
+}
+
+alff_cbf_df <- as.data.frame(matrix(output, byrow = TRUE, ncol = 3)) %>% rename(cbf_ind = V1, alff_ind = V2, pimco = V3)
+```
+
+```{r}
+alff_cbf_df <- alff_cbf_df %>% 
+  mutate(cbf_abs = abs(cbf_ind), 
+         alff_abs = abs(alff_ind), 
+         max_abs = pmax(cbf_abs, alff_abs)) %>% 
+  select(pimco, everything())
+
+pearson_cor <- cor(alff_cbf_df, method = "pearson")
+kendall_cor <- cor(alff_cbf_df, method = "kendall")
+
+for (i in 1:ncol(alff_cbf_df)) {
+  for (j in 1:ncol(alff_cbf_df)) {
+    if (i <= j) {
+      pearson_cor[i, j] = NA
+      kendall_cor[i, j] = NA
+    }
+  }
+}
+```
+
+```{r}
+title_size <- 25
+x_size <- 20
+x_angle <- 45
+y_axis_size <- 15
+y_title_size <- 23
+head(alff_cbf_samp)
+
+with(alff_cbf_samp, plot(alff_ind, cbf_ind))
+with(alff_cbf_samp, plot(alff_abs, cbf_abs))
+
+with(alff_cbf_samp, plot(pimco, alff_ind))
+ggplot(alff_cbf_samp) + geom_point(aes(pimco, alff_ind, color = log(cbf_abs + 0.25))) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none")
+
+with(alff_cbf_samp, plot(pimco, alff_abs))
+ggplot(alff_cbf_samp) + geom_point(aes(pimco, alff_abs, color = sqrt(cbf_abs))) + 
+  scale_fill_continuous(breaks = c(0, 2.5, 5)) +
+  theme_minimal()
+with(alff_cbf_samp, plot(pimco, cbf_abs))
+
+with(alff_cbf_samp, plot(pimco, max_abs))
+
+pearson_cor
+kendall_cor
+```
+
+```{r}
+m1 <- ggplot(alff_cbf_samp) + geom_point(aes(alff_abs, cbf_abs)) + 
+  labs(x = "WLR IMCo Magnitude \n(CBF ~ ALFF)", y = "WLR IMCo Magnitude \n(ALFF ~ CBF)") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); m1
+
+m2 <- ggplot(alff_cbf_samp) + geom_point(aes(pimco, alff_abs, color = log(cbf_abs + 0.25))) + 
+  labs(x = "pIMCo", y = "WLR IMCo Magnitude \n(CBF ~ ALFF)") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); m2
+
+m3 <- ggplot(alff_cbf_samp) + geom_point(aes(pimco, max_abs)) + 
+  labs(x = "pIMCo", y = "Max WLR IMCo \nMagnitude") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); m3
+
+kendall_cor <- cor(alff_cbf_df[, c(1, 5, 6)], method = "kendall")
+rownames(kendall_cor) <- c("pIMCo", "WLR IMCo \nMagnitude \n(ALFF ~ CBF)", "Max WLR \nIMCo \nMagnitude")
+colnames(kendall_cor) <- c("pIMCo", "WLR IMCo \nMagnitude \n(ALFF ~ CBF)", "Max WLR \nIMCo \nMagnitude")
+m4 <- ggcorrplot(kendall_cor, type = "upper", 
+                 show.diag = TRUE, lab = TRUE,
+                 ggtheme = theme_classic(),
+                 show.legend = FALSE,
+                 colors = c("#D55E00", "white", "#0072B2")); m4
+
+main_figure <- ggarrange(m1, m2, m3, m4, nrow = 2, ncol = 2); main_figure
+ggsave(filename = here("output/figures/simulation/main_pimco_imco.png"), plot = main_figure, type = "cairo-png", width = 15.083, height = 10.906, dpi = 300)
+```
+
+
+```{r}
+s1 <- ggplot(alff_cbf_samp) + geom_point(aes(alff_ind, cbf_ind)) + 
+  labs(x = "WLR IMCo \n(CBF ~ ALFF)", y = "WLR IMCo \n(ALFF ~ CBF)") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); s1
+
+s2 <- ggplot(alff_cbf_samp) + geom_point(aes(pimco, alff_ind, color = log(cbf_abs + 0.25))) + 
+  labs(x = "pIMCo", y = "WLR IMCo \n(CBF ~ ALFF)") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); s2
+
+s3 <- ggplot(alff_cbf_samp) + geom_point(aes(pimco, cbf_ind, color = log(alff_abs + 0.25))) + 
+  labs(x = "pIMCo", y = "WLR IMCo \n(ALFF ~ CBF)") +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(size = axis_size),
+        axis.title = element_text(size = xy_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5),
+        legend.position = "none"); s3
+
+kendall_cor <- cor(alff_cbf_df[, 1:3], method = "kendall")
+rownames(kendall_cor) <- c("pIMCo\n", "WLR IMCo  \n(ALFF ~ CBF)", "WLR IMCo  \n(CBF ~ ALFF)")
+colnames(kendall_cor) <- c("pIMCo\n", "WLR IMCo  \n(ALFF ~ CBF)", "WLR IMCo  \n(CBF ~ ALFF)")
+# s4 <- corrplot(kendall_cor, type="upper", method="color",
+#          tl.pos="lt", tl.col="black",  tl.offset=1, tl.srt=0, col.lim = c(0, 1))
+# s4 <- corrplot(kendall_cor, add=T, type="lower", method="number",
+#          col="black", diag=F, tl.pos="n", cl.pos="n")
+s4 <- ggcorrplot(kendall_cor, type = "lower", 
+                 show.diag = TRUE, lab = TRUE,
+                 ggtheme = theme_classic(),
+                 show.legend = FALSE,
+                 colors = c("#D55E00", "white", "#0072B2")); s4
+
+supplement <- ggarrange(s1, s2, s3, s4, nrow = 2, ncol = 2); supplement
+
+ggsave(filename = here("output/figures/simulation/supplement_pimco_imco.png"), plot = supplement, type = "cairo-png", width = 15.083, height = 10.906, dpi = 300)
+```
+
+

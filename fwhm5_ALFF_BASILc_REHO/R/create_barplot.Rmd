@@ -1,0 +1,163 @@
+---
+title: "create_barplot"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggpubr)
+library(ggthemes)
+library(here)
+library(ggprism)
+```
+
+```{r}
+load(here("input/csvs/settings.RData"))
+spin_test <- read_csv(file.path(settings$output_dir, "figures/spin_test.csv"))
+
+coupled_aal <- read_csv(file.path(settings$output_dir, "csvs/coupled_aal.csv")) %>%
+  filter(map_name == "global_age" | map_name == "global_sex")
+coupled_aal <- coupled_aal %>%
+  mutate(
+    region = case_when(
+      network_ids == 4100 ~ "Hippocampus",
+      network_ids == 4200 ~ "Amygdala",
+      network_ids == 7000 ~ "Caudate",
+      network_ids == 7010 ~ "Putamen",
+      network_ids == 7020 ~ "Pallidum",
+      network_ids == 7100 ~ "Thalamus"))
+
+coupled_yeo7 <- read_csv(file.path(settings$output_dir, "csvs/coupled_yeo7.csv")) %>%
+  filter(map_name == "global_age" | map_name == "global_sex")
+coupled_yeo7 <- coupled_yeo7 %>%
+  mutate(
+    region = case_when(
+      network_ids == 1 ~ "Visual",
+      network_ids == 2 ~ "Somatomotor",
+      network_ids == 3 ~ "Dorsal Attention",
+      network_ids == 4 ~ "Ventral Attention",
+      network_ids == 5 ~ "Limbic",
+      network_ids == 6 ~ "Frontoparietal",
+      network_ids == 7 ~ "Default"))
+coupled_yeo7$network_ids <- as.factor(coupled_yeo7$network_ids)
+coupled_yeo7 <- coupled_yeo7 %>% cbind(spin_results = c(t(spin_test[1, 2:8]), t(spin_test[3, 2:8])))
+```
+
+```{r}
+title_size <- 25
+x_size <- 20
+x_angle <- 45
+y_axis_size <- 15
+y_title_size <- 23
+y_title <- "Proportion"
+pval_size <- 5
+pval_nudge <- 0.01
+
+y_lims_age <- c(0, 0.4)
+y_lims_sex <- c(0, 0.4)
+
+age_aal <- ggplot(coupled_aal %>% filter(map_name == "global_age"), 
+       aes(region, proportion)) +
+  geom_col(fill = "grey69", width = .6) +
+  labs(x = "", y = y_title,
+       title = "Age Associations in AAL Regions") +
+  scale_y_continuous(limits = y_lims_age) +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(size = x_size, vjust = .5, angle = x_angle),
+        axis.text.y = element_text(size = y_axis_size),
+        axis.title.y = element_text(size = y_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); age_aal
+
+age_yeo7 <- ggplot(coupled_yeo7 %>% filter(map_name == "global_age"), 
+       aes(network_ids, proportion)) +
+  geom_col(fill = "grey69", width = .6) +
+  labs(x = "", y = y_title,
+       title = "Age Associations in Yeo 7 Networks") +
+  scale_y_continuous(limits = y_lims_age) +
+  scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal\nAttention", "Ventral\nAttention", "Limbic", "Fronto-\nparietal", "Default")) +
+  geom_text(label = c("", "", "", "", "", "p = 0.004", "p < 0.0005"), size = pval_size, nudge_y = pval_nudge) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(size = x_size, vjust = .5, angle = x_angle),
+        axis.text.y = element_text(size = y_axis_size),
+        axis.title.y = element_text(size = y_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); age_yeo7
+
+sex_aal <- ggplot(coupled_aal %>% filter(map_name == "global_sex"), 
+       aes(region, proportion)) +
+  geom_col(fill = "grey69", width = .6) +
+  labs(x = "", y = y_title,
+       title = "Sex Associations in AAL Regions") +
+  scale_y_continuous(limits = y_lims_sex) +
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(size = x_size, vjust = .5, angle = x_angle),
+        axis.text.y = element_text(size = y_axis_size),
+        axis.title.y = element_text(size = y_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); sex_aal
+
+sex_yeo7 <- ggplot(coupled_yeo7 %>% filter(map_name == "global_sex"), 
+       aes(network_ids, proportion)) +
+  geom_col(fill = "grey69", width = .6) +
+  labs(x = "", y = y_title,
+       title = "Sex Associations in Yeo 7 Networks") +
+  scale_y_continuous(limits = y_lims_sex) +
+  scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal\nAttention", "Ventral\nAttention", "Limbic", "Fronto-\nparietal", "Default")) +
+  geom_text(label = c("", "", "", "p = 0.0155", "", "", ""), size = pval_size, nudge_y = pval_nudge) + 
+  theme(panel.border = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "gray85"),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(size = x_size, vjust = .5, angle = x_angle),
+        axis.text.y = element_text(size = y_axis_size),
+        axis.title.y = element_text(size = y_title_size),
+        plot.title = element_text(size = title_size, hjust = 0.5)); sex_yeo7
+```
+
+```{r}
+age_sex_yeo <- ggarrange(age_aal, sex_aal, age_yeo7, sex_yeo7, nrow = 2, ncol = 2); age_sex_yeo
+ggsave(filename = here("output/figures/simulation/joint_barplots_norace.png"), plot = age_sex_yeo, type = "cairo-png", width = 15.083, height = 10.906, dpi = 300)
+```
+
+```{r}
+surf_vals <- read_csv(here("output/csvs/coupling_descriptive_surf.csv"))
+surf_plot <- ggplot(surf_vals, aes(mean_surf, var_surf)) + 
+   geom_point(color = "grey69") +
+   geom_smooth(method = 'lm', formula = y ~ x, se = F, colour = "grey22", size = 3) +
+  labs(x = "Mean", y = "Variance") +
+   theme(panel.border = element_blank(), 
+         panel.background = element_blank(),
+         panel.grid.major.y = element_line(color = "gray85"),
+         axis.line = element_line(colour = "black"),
+         axis.text = element_text(size = axis_size),
+         axis.title = element_text(size = xy_title_size),
+         plot.title = element_text(size = title_size, hjust = 0.5)); surf_plot
+cor(surf_vals$mean_surf, surf_vals$var_surf)
+```
+
+```{r}
+health <- read_csv(here("input/csvs/demographics/healthexclude_ltn.csv"))
+rest <- read_csv(here("input/csvs/demographics/n1601_RestQAData.csv"))
+pcasl <- read_csv(here("input/csvs/demographics/n1601_PcaslQaData.csv"))
+t1 <- read_csv(here("input/csvs/demographics/n1601_t1QaData_v2.csv"))
+basil_subj <- read_table(here("input/csvs/demographics/basil_subj.txt"), col_names = FALSE)
+basil_subj$scanid <- as.numeric(basil_subj$scanid)
+binded <- read_csv(here("input/csvs/demographics/binded_demographics.csv"))
+
+total <- health %>% 
+  inner_join(rest, by = c("bblid", "scanid")) %>% 
+  inner_join(pcasl, by = c("bblid", "scanid")) %>% 
+  inner_join(t1, by = c("bblid", "scanid"))
+
+total_test <- total %>% filter(pcaslExclude == 0)
+t1_exclude <- total %>% filter(t1PostProcessExclude + fsReviewExclude >= 1)
+rest_exclude <- total %>% filter(fsFinalExclude == 0, restExcludeVoxelwise == 1)
+```
+
