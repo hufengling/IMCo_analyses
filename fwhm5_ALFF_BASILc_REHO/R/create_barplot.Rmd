@@ -110,7 +110,7 @@ sex_yeo7 <- ggplot(coupled_yeo7 %>% filter(map_name == "global_sex"),
        title = "Sex Associations in Yeo 7 Networks") +
   scale_y_continuous(limits = y_lims_sex) +
   scale_x_discrete(labels = c("Visual", "Somatomotor", "Dorsal\nAttention", "Ventral\nAttention", "Limbic", "Fronto-\nparietal", "Default")) +
-  geom_text(label = c("", "", "", "p = 0.0155", "", "", ""), size = pval_size, nudge_y = pval_nudge) + 
+  geom_text(label = c("", "", "", "p = 0.016", "", "p = 0.147", ""), size = pval_size, nudge_y = pval_nudge) + 
   theme(panel.border = element_blank(), 
         panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "gray85"),

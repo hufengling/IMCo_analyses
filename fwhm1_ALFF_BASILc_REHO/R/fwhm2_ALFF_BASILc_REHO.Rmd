@@ -1,5 +1,5 @@
 ---
-title: "fwhm5_ALFF_BASILc_REHO"
+title: "fwhm2_ALFF_BASILc_REHO"
 author: "Fengling Hu"
 output: html_document
 ---
