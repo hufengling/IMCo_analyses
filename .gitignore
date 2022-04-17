@@ -2,5 +2,5 @@
 **/*.mat
 **/*.mgh
 .DS_Store
-
+**/*.RData
 .Rproj.user

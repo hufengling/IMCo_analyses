@@ -23,12 +23,11 @@ change_mode <- function(mode) {
              out_dir = mode_output_dir,
              out_name = out_name,
              fwhm = fwhm,
-             prop_miss = prop_miss,
-             pca_type = mode
+             prop_miss = prop_miss
         )
 
         return(NULL)
 }
 
-#change_mode("global_wcov")
+change_mode("global_wcov")
 change_mode("unscaled_wcor")
