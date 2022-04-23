@@ -4,7 +4,12 @@ fig:barplot
 fig:ageexample
 fig:binary
 fig:wlrpca
+fig:simulation
+fig:transform
 fig:supplement
+fig:fwhm2
+fig:fwhm5
+fig:suppimcoimco
 introduction
 methods
 subjects
@@ -13,7 +18,7 @@ image-processing
 methodology-for-estimating-pimco
 voxel-wise-statistical-analysis
 spin-testing
-code-and-data-availibility
+code-and-data-availability
 results
 coupling-varies-across-the-cortical-surface-and-is-increased-in-discrete-regions-bilaterally
 cbf-alff-reho-coupling-evolves-with-age-throughout-gray-matter-structures

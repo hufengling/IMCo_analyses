@@ -1,7 +1,23 @@
 # Supplementary Materials
 
+```{r transform, fig.cap = "Example of change in distribution due to the proposed transformation from proportional first eigenvalue to coupling value. Colored lines represent density plots of proportional first eigenvalues or coupling values from five randomly selected subjects. Black lines represent the corresponding normal distributions -- mean and standard deviation was calculated for both proportional first eigenvalues and coupling values across the five subjects."}
+knitr::include_graphics("figures/coupling_transform.png")
+```
+
 ```{r supplement, fig.cap = "A) Voxel-wise means across subjects of cortical CBF. B) Voxel-wise variances across subjects of cortical CBF. C) Voxel-wise means across subjects of cortical ALFF. D) Voxel-wise variances across subjects of cortical ALFF. E) Voxel-wise means across subjects of cortical ReHo. F) Voxel-wise variances across subjects of cortical ReHo."}
 knitr::include_graphics("figures/supplement-01.png")
+```
+
+```{r fwhm2, fig.cap = "Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. No p-values were significant at alpha level of 0.05, but the lowest p-values correspond to similar networks as analyses done with FWHM of 3 and 5."}
+knitr::include_graphics("figures/fwhm2.png")
+```
+
+```{r fwhm5, fig.cap = "Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. These p-values correspond to similar networks as analyses done with FWHM of 2 and 3."}
+knitr::include_graphics("figures/fwhm5.png")
+```
+
+```{r suppimcoimco, fig.cap = "Comparison between pIMCo coupling values and WLR-based IMCo coupling values across 5,000 randomly sampled voxels. A) Relationship between WLR-ALFF and WLR-CBF coupling value magnitudes showing a strong inverse relationship. B) Relationship between pIMCo and WLR-ALFF magnitudes. Color of points corresponds to the magnitude of the WLR-CBF coupling value, with lighter color indicating higher magnitude. C) Relationship between pIMCo and WLR-CBF magnitudes. Color of points corresponds to the magnitude of the WLR-ALFF coupling value, with lighter color indicating higher magnitude. D) Pairwise non-parametric Kendall correlations between pIMCo values, WLR-ALFF magnitudes, and WLR-CBF magnitudes."}
+knitr::include_graphics("figures/supplement_pimco_imco.png")
 ```
 
 <!---
