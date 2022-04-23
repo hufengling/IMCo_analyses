@@ -3,4 +3,5 @@
 **/*.mgh
 .DS_Store
 **/*.RData
+**/*.ai
 .Rproj.user

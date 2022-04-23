@@ -8,11 +8,11 @@ knitr::include_graphics("figures/coupling_transform.png")
 knitr::include_graphics("figures/supplement-01.png")
 ```
 
-```{r fwhm2, fig.cap = "Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. No p-values were significant at alpha level of 0.05, but the lowest p-values correspond to similar networks as analyses done with FWHM of 3 and 5."}
+```{r fwhm2, fig.cap = "Results from re-analysis using FWHM of 2mm. Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. No p-values were significant at alpha level of 0.05, but the lowest p-values correspond to similar networks as analyses done with FWHM of 3 and 5."}
 knitr::include_graphics("figures/fwhm2.png")
 ```
 
-```{r fwhm5, fig.cap = "Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. These p-values correspond to similar networks as analyses done with FWHM of 2 and 3."}
+```{r fwhm5, fig.cap = "Results from re-analysis using FWHM of 5mm. Proportion of voxels in AAL subcortical regions and Yeo 7 cortical networks that showed significant coupling-age and coupling-sex associations when in-scanner motion was included as a covariate (FDR corrected p < 0.05). Spin test was performed for all Yeo 7 networks; the two lowest p-values are reported for each of age and sex. These p-values correspond to similar networks as analyses done with FWHM of 2 and 3."}
 knitr::include_graphics("figures/fwhm5.png")
 ```
 
